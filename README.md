@@ -162,13 +162,18 @@ admin/
      categories-admin.js, coupons-admin.js, content-admin.js
 ```
 
-## 🚀 Deployment
+## 🚀 cPanel / MySQL Deployment
 
-This project is built for **Hosted Deploy**. To publish it live, use the **Publish tab** (or ask the agent to run a Hosted Deploy), which will provision:
-- The static site files
-- A D1 database seeded from the `products`, `orders`, and `settings` table schemas
+This project now includes a small PHP/MySQL backend for cPanel hosting. The frontend still calls the same `tables/{table}` API paths through `js/api.js`; `.htaccess` rewrites those requests to `api/tables.php`.
 
-Default demo admin login after deploy: **username `admin`, password `admin123`** (change this immediately in `admin/settings.html` after first login).
+1. In cPanel, create a MySQL database and database user, then assign the user to the database.
+2. Open phpMyAdmin, select that database, and import `database/demo_hair_store.sql`.
+3. Edit `api/config.php` and replace `DB_NAME`, `DB_USER`, and `DB_PASS` with your cPanel database details.
+4. Upload the full project to `public_html` or your chosen domain folder.
+
+The demo SQL creates every table used by the current code: `products`, `orders`, `settings`, `categories`, `coupons`, `site_content`, `product_media`, `media_chunks`, `product_variations`, `order_tracking_notes`, and `size_test_rt`.
+
+Default demo admin login: **username `admin`, password `admin123`**. Change it in `admin/settings.html` after first login.
 
 ## 🐛 Fixed: Admin Login Failure (relative-path fetch bug)
 

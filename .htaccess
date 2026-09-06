@@ -1,0 +1,6 @@
+RewriteEngine On
+
+# Route the existing frontend API calls to the cPanel PHP/MySQL backend.
+RewriteRule ^tables/([^/]+)/?$ api/tables.php?table=$1 [QSA,L]
+RewriteRule ^tables/([^/]+)/([^/]+)/?$ api/tables.php?table=$1&id=$2 [QSA,L]
+
