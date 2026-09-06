@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products — Amah Wigs Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar" id="adminSidebar"></aside>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="btn btn-outline btn-icon" id="sidebarToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+        <h1 id="pageTitle">Products</h1>
+      </div>
+      <div class="admin-topbar-actions">
+        <button class="btn btn-primary btn-sm" id="newProductBtn"><i class="fa-solid fa-plus"></i> New Product</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>All Products</h3>
+          <div class="filters-row">
+            <input type="text" id="searchInput" placeholder="Search products...">
+            <select id="typeFilter">
+              <option value="">All Types</option>
+              <option value="in_stock">In Stock</option>
+              <option value="pre_order">Pre-Order</option>
+            </select>
+            <select id="statusFilter">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Type</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="productsBody">
+              <tr class="empty-row"><td colspan="7">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">New Product</h3>
+      <button class="modal-close" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="productForm">
+      <div class="modal-body">
+        <input type="hidden" name="id">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price ($) *</label>
+            <input type="number" name="price" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>Compare-at Price ($)</label>
+            <input type="number" name="compare_at_price" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category" id="categorySelect"></select>
+          </div>
+          <div class="form-group">
+            <label>SKU</label>
+            <input type="text" name="sku">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Product Media (photos & video) *</label>
+          <p class="form-hint" style="margin-top:-2px;margin-bottom:8px;">Upload photos (JPG, PNG, WEBP, GIF, HEIC — max 5MB each) and/or one video (MP4, WEBM, MOV — max 25MB). Drag the ⣿ handle to reorder; the first photo is used as the product's cover image everywhere on the store.</p>
+          <input type="file" id="mediaFileInput" accept="image/*,video/*" multiple style="display:none;">
+          <button type="button" class="btn btn-outline btn-sm" id="addMediaBtn"><i class="fa-solid fa-upload"></i> Upload Photos / Video</button>
+          <span id="mediaUploadStatus" style="font-size:12px;color:var(--gray-500);margin-left:8px;"></span>
+          <div id="mediaList" class="media-list"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Product Type *</label>
+            <select name="product_type" id="productTypeSelect" required>
+              <option value="in_stock">In Stock (ships now)</option>
+              <option value="pre_order">Pre-Order (ships later)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label id="stockLabel">Stock Quantity *</label>
+            <input type="number" name="stock_quantity" min="0" required>
+            <p class="form-hint" id="stockHint">Units currently in inventory.</p>
+          </div>
+          <div class="form-group" id="depositGroup" style="display:none;">
+            <label>Deposit Percent (%)</label>
+            <input type="number" name="deposit_percent" min="0" max="100" value="0">
+            <p class="form-hint">% of price required upfront to reserve. 0 = full payment now.</p>
+          </div>
+        </div>
+        <div class="form-group" id="releaseDateGroup" style="display:none;">
+          <label>Expected Release Date</label>
+          <input type="text" name="release_date" placeholder="e.g. 2026-12-01 or Q4 2026">
+        </div>
+        <div class="form-group">
+          <label class="checkbox-row"><input type="checkbox" name="featured"> Feature this product on the homepage</label>
+        </div>
+
+        <div class="form-group" style="border-top:1px solid var(--gray-200);padding-top:16px;">
+          <label>Product Variations (e.g. Color, Size)</label>
+          <p class="form-hint" style="margin-top:-2px;margin-bottom:10px;">Add option groups customers can choose from on the product page. Leave empty if this product has no variations.</p>
+          <div id="variationGroups"></div>
+          <button type="button" class="btn btn-outline btn-sm" id="addVariationGroupBtn"><i class="fa-solid fa-plus"></i> Add Variation Group</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelModalBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveProductBtn"><i class="fa-solid fa-check"></i> Save Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Quick Add Category Modal -->
+<div class="modal-overlay" id="quickAddCategoryModal">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="modal-head">
+      <h3>Quick Add Category</h3>
+      <button class="modal-close" id="closeQuickCategoryBtn" type="button"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="quickCategoryForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Category Name *</label>
+          <input type="text" name="quick_name" id="quickCategoryName" required placeholder="e.g. Bundles">
+        </div>
+        <div class="form-group">
+          <label>Icon</label>
+          <div class="icon-field-row">
+            <span class="icon-preview-badge"><i class="fa-solid fa-shirt" id="quickIconPreview"></i></span>
+            <input type="hidden" name="quick_icon" id="quick_icon">
+            <button type="button" class="btn btn-outline btn-sm" id="quickIconPickerBtn"><i class="fa-solid fa-icons"></i> Choose Icon</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelQuickCategoryBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveQuickCategoryBtn">Add Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/media-utils.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-layout.js"></script>
+<script src="js/icon-picker.js"></script>
+<script src="js/products-admin.js"></script>
+</body>
+</html>

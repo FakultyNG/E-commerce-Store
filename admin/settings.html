@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Amah Wigs Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar" id="adminSidebar"></aside>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="btn btn-outline btn-icon" id="sidebarToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+        <h1 id="pageTitle">Settings</h1>
+      </div>
+    </div>
+
+    <div class="admin-content" style="max-width:640px;">
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-store"></i> Store Information</h3></div>
+        <form id="storeForm">
+          <div class="form-group">
+            <label>Store Name</label>
+            <input type="text" name="store_name" required>
+          </div>
+          <div class="form-group">
+            <label>Currency Symbol</label>
+            <input type="text" name="currency_symbol" maxlength="3" required style="max-width:100px;">
+          </div>
+          <button type="submit" class="btn btn-primary" id="saveStoreBtn"><i class="fa-solid fa-check"></i> Save Store Info</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-credit-card"></i> Paystack Payment Settings</h3></div>
+        <p style="font-size:13px;color:var(--gray-500);margin-top:-8px;">Powers the <strong>Credit/Debit Card</strong>, <strong>Bank Transfer</strong>, and <strong>Opay</strong> payment options at checkout via Paystack's Inline popup. Get your keys from your <a href="https://dashboard.paystack.com/#/settings/developer" target="_blank" rel="noopener">Paystack Dashboard → Settings → API Keys & Webhooks</a>.</p>
+        <form id="paystackForm">
+          <div class="form-group">
+            <label class="checkbox-row"><input type="checkbox" name="paystack_enabled"> Enable Paystack payment methods at checkout</label>
+          </div>
+          <div class="form-group">
+            <label>Paystack Public Key</label>
+            <input type="text" name="paystack_public_key" placeholder="pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+            <p class="form-hint">Used in the browser to open the Paystack payment popup. Safe to expose publicly.</p>
+          </div>
+          <div class="form-group">
+            <label>Paystack Secret Key</label>
+            <input type="text" name="paystack_secret_key" placeholder="sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+            <p class="form-hint">Kept for your reference only — this static site never sends the secret key from the browser. For production, real server-side verification of payments (via this secret key) requires a backend, which this static store does not have; treat Paystack payments here as customer-confirmed rather than server-verified.</p>
+          </div>
+          <div class="form-group">
+            <label>Paystack Charge Currency</label>
+            <select name="paystack_currency" style="max-width:160px;">
+              <option value="NGN">NGN (₦)</option>
+              <option value="GHS">GHS (₵)</option>
+              <option value="ZAR">ZAR (R)</option>
+              <option value="USD">USD ($)</option>
+              <option value="KES">KES (KSh)</option>
+            </select>
+            <p class="form-hint">Must be a currency enabled on your Paystack account. Your store's display currency symbol above is separate.</p>
+          </div>
+          <button type="submit" class="btn btn-primary" id="savePaystackBtn"><i class="fa-solid fa-check"></i> Save Paystack Settings</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-building-columns"></i> Offline / Manual Bank Transfer</h3></div>
+        <p style="font-size:13px;color:var(--gray-500);margin-top:-8px;">Shown at checkout as the <strong>"Offline Payment"</strong> option — customers see these bank details, pay manually, then upload a receipt for you to confirm.</p>
+        <form id="offlineForm">
+          <div class="form-group">
+            <label class="checkbox-row"><input type="checkbox" name="offline_payment_enabled"> Enable Offline Payment at checkout</label>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Bank Name</label><input type="text" name="offline_bank_name" placeholder="e.g. GTBank"></div>
+            <div class="form-group"><label>Account Name</label><input type="text" name="offline_account_name" placeholder="e.g. Amah Wigs Ltd"></div>
+          </div>
+          <div class="form-group"><label>Account Number</label><input type="text" name="offline_account_number" placeholder="e.g. 0123456789"></div>
+          <div class="form-group">
+            <label>Extra Instructions (optional)</label>
+            <textarea name="offline_instructions" rows="2" placeholder="e.g. Use your order number as the transfer reference."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="saveOfflineBtn"><i class="fa-solid fa-check"></i> Save Offline Payment Settings</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-lock"></i> Admin Credentials</h3></div>
+        <p style="font-size:13px;color:var(--gray-500);margin-top:-8px;">Change the username and password used to sign in to this dashboard.</p>
+        <form id="credsForm">
+          <div class="form-group">
+            <label>Admin Username</label>
+            <input type="text" name="admin_username" required>
+          </div>
+          <div class="form-group">
+            <label>Admin Password</label>
+            <input type="text" name="admin_password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="saveCredsBtn"><i class="fa-solid fa-check"></i> Update Credentials</button>
+        </form>
+        <div class="security-note" style="background:var(--warn-light);color:var(--warn);font-size:12px;padding:12px 14px;border-radius:8px;margin-top:16px;line-height:1.6;">
+          <i class="fa-solid fa-triangle-exclamation"></i> This login only guards access to this dashboard UI on a static site — it is not a secure authentication system. Credentials are stored in plain text in the table data. Do not reuse a real password here.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-layout.js"></script>
+<script src="js/settings-admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop All Products — Amah Wigs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .shop-layout { display: grid; grid-template-columns: 240px 1fr; gap: 32px; padding: 24px 0 70px; }
+  .filter-panel { border: 1px solid var(--gray-200); border-radius: 12px; padding: 20px; background: #fff; align-self: start; position: sticky; top: 90px; }
+  .filter-panel h4 { font-size: 14px; margin: 0 0 12px; }
+  .filter-group { margin-bottom: 22px; }
+  .filter-option { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--gray-700); padding: 6px 0; cursor: pointer; }
+  .filter-option input { accent-color: var(--primary); }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .toolbar select { padding: 9px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 13.5px; font-family: inherit; }
+  @media (max-width: 900px) { .shop-layout { grid-template-columns: 1fr; } .filter-panel { position: static; } }
+</style>
+</head>
+<body>
+
+<div id="header-slot"></div>
+
+<main class="container">
+  <div class="breadcrumbs"><a href="index.html">Home</a> / <span id="pageTitleCrumb">Shop</span></div>
+  <h1 style="font-size:26px;font-weight:800;margin:0 0 6px;" id="shopHeading">All Products</h1>
+  <p style="color:var(--gray-500);margin:0 0 10px;" id="shopSubheading">Browse our full catalog of in-stock and pre-order items.</p>
+
+  <div class="shop-layout">
+    <aside class="filter-panel">
+      <h4>Product Type</h4>
+      <div class="filter-group" id="typeFilters">
+        <label class="filter-option"><input type="radio" name="type" value="" checked> All Products</label>
+        <label class="filter-option"><input type="radio" name="type" value="in_stock"> In Stock</label>
+        <label class="filter-option"><input type="radio" name="type" value="pre_order"> Pre-Order</label>
+      </div>
+      <h4>Category</h4>
+      <div class="filter-group" id="categoryFilters">
+        <label class="filter-option"><input type="radio" name="category" value="" checked> All Categories</label>
+      </div>
+      <h4>Max Price</h4>
+      <div class="filter-group">
+        <input type="range" id="priceRange" min="0" max="1000" step="10" value="1000" style="width:100%;">
+        <div style="font-size:13px;color:var(--gray-500);margin-top:6px;">Up to $<span id="priceRangeVal">1000</span></div>
+      </div>
+      <button class="btn btn-outline btn-block btn-sm" id="resetFiltersBtn">Reset Filters</button>
+    </aside>
+
+    <section>
+      <div class="toolbar">
+        <span style="font-size:13.5px;color:var(--gray-500);" id="resultCount">Loading...</span>
+        <select id="sortSelect">
+          <option value="default">Sort: Featured</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="name_asc">Name: A-Z</option>
+        </select>
+      </div>
+      <div class="product-grid" id="productGrid">
+        <p style="color:var(--gray-500);">Loading products...</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="footer-slot"></div>
+<div id="bottom-nav-slot"></div>
+
+<script src="js/api.js"></script>
+<script src="js/site-content.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/wishlist.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/product-card.js"></script>
+<script src="js/shop.js"></script>
+</body>
+</html>

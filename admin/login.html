@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Amah Wigs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo"><span class="login-logo-text">Amah Wigs</span></div>
+    <p class="login-sub">Sign in to manage your store</p>
+
+    <div class="login-error" id="loginError"><i class="fa-solid fa-triangle-exclamation"></i> Invalid username or password.</div>
+
+    <form class="login-form" id="loginForm">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;" id="loginBtn">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+      </button>
+    </form>
+
+    <p class="login-hint">Default demo credentials: admin / admin123</p>
+    <div class="security-note">
+      <i class="fa-solid fa-shield-halved"></i> This is a client-side demo login for a static site. It is not secure against a determined user viewing page source — do not use it to protect sensitive real customer data.
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="js/admin-auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (isAdminLoggedIn()) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+
+    const username = form.username.value.trim();
+    const password = form.password.value;
+
+    try {
+      const settings = await API.get('settings', 'store_settings');
+      if (username === settings.admin_username && password === settings.admin_password) {
+        sessionStorage.setItem('nexova_admin_session', 'true');
+        window.location.href = 'index.html';
+      } else {
+        errorBox.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+      }
+    } catch (err) {
+      console.error(err);
+      errorBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Could not verify credentials. Try again.';
+      errorBox.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders — Amah Wigs Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar" id="adminSidebar"></aside>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="btn btn-outline btn-icon" id="sidebarToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+        <h1 id="pageTitle">Orders</h1>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>All Orders</h3>
+          <div class="filters-row">
+            <input type="text" id="searchInput" placeholder="Search order # or customer...">
+            <select id="typeFilter">
+              <option value="">All Types</option>
+              <option value="in_stock">In Stock</option>
+              <option value="pre_order">Pre-Order</option>
+              <option value="mixed">Mixed</option>
+            </select>
+            <select id="fulfillmentFilter">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="awaiting_stock">Awaiting Stock</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Order</th><th>Customer</th><th>Items</th><th>Type</th><th>Total</th><th>Payment</th><th>Fulfillment</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="ordersBody">
+              <tr class="empty-row"><td colspan="9">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-head">
+      <h3 id="orderModalTitle">Order Details</h3>
+      <button class="modal-close" id="closeOrderModalBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="orderModalBody"></div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" id="closeOrderModalBtn2">Close</button>
+      <button type="button" class="btn btn-primary" id="saveOrderStatusBtn"><i class="fa-solid fa-check"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-layout.js"></script>
+<script src="js/orders-admin.js"></script>
+
+</body>
+</html>

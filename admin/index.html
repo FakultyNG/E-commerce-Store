@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Amah Wigs Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar" id="adminSidebar"></aside>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="btn btn-outline btn-icon" id="sidebarToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="admin-topbar-actions">
+        <a href="products.html?new=1" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> New Product</a>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <div class="stat-grid" id="statGrid">
+        <div class="stat-card"><p style="color:var(--gray-500);">Loading stats...</p></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1.4fr 1fr; gap: 24px;" id="dashboardGrid">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Revenue Overview (Last 7 Days)</h3>
+          </div>
+          <div style="height:280px;"><canvas id="revenueChart"></canvas></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Order Types</h3>
+          </div>
+          <div style="height:280px;"><canvas id="typeChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Recent Orders</h3>
+          <a href="orders.html" class="btn btn-outline btn-sm">View All <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Order</th><th>Customer</th><th>Type</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th></tr>
+            </thead>
+            <tbody id="recentOrdersBody">
+              <tr class="empty-row"><td colspan="7">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--warn);"></i> Low Stock Alerts</h3>
+          <a href="products.html" class="btn btn-outline btn-sm">Manage Products <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Product</th><th>Category</th><th>Stock</th><th>Type</th></tr></thead>
+            <tbody id="lowStockBody">
+              <tr class="empty-row"><td colspan="4">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-layout.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

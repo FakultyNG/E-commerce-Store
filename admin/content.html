@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theme & Content — Amah Wigs Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar" id="adminSidebar"></aside>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="btn btn-outline btn-icon" id="sidebarToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+        <h1 id="pageTitle">Theme & Content</h1>
+      </div>
+    </div>
+
+    <div class="admin-content" style="max-width:760px;">
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-palette"></i> Brand / Team Colors</h3></div>
+        <p style="font-size:13px;color:var(--gray-500);margin-top:-8px;">Change your store's colors here — this is the one place to update your team/brand colors across the whole storefront (buttons, links, badges, logo text).</p>
+        <form id="colorsForm">
+          <div class="form-group">
+            <label>Primary Color (buttons, links, logo)</label>
+            <div class="color-field-row">
+              <input type="color" data-pair="primary_color">
+              <input type="text" name="primary_color" placeholder="#0f172a">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Accent Color (pre-order badges/highlights)</label>
+            <div class="color-field-row">
+              <input type="color" data-pair="accent_color">
+              <input type="text" name="accent_color" placeholder="#f59e0b">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Dark Color (header/footer background)</label>
+            <div class="color-field-row">
+              <input type="color" data-pair="dark_color">
+              <input type="text" name="dark_color" placeholder="#0f172a">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Success Color (in-stock states)</label>
+              <div class="color-field-row">
+                <input type="color" data-pair="success_color">
+                <input type="text" name="success_color" placeholder="#16a34a">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Danger Color (sale/out-of-stock)</label>
+              <div class="color-field-row">
+                <input type="color" data-pair="danger_color">
+                <input type="text" name="danger_color" placeholder="#dc2626">
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="saveColorsBtn"><i class="fa-solid fa-check"></i> Save Colors</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-bullhorn"></i> Announcement Bar</h3></div>
+        <form id="announceForm">
+          <div class="form-group">
+            <label>Announcement Text</label>
+            <input type="text" name="announcement_text">
+          </div>
+          <button type="submit" class="btn btn-primary" id="saveAnnounceBtn"><i class="fa-solid fa-check"></i> Save Announcement</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-house"></i> Homepage Hero</h3></div>
+        <form id="heroForm">
+          <div class="form-group"><label>Badge Text</label><input type="text" name="hero_badge_text"></div>
+          <div class="form-group"><label>Heading</label><input type="text" name="hero_heading"></div>
+          <div class="form-group"><label>Subheading</label><textarea name="hero_subheading" rows="2"></textarea></div>
+          <div class="form-group">
+            <label>Hero Image</label>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+              <img id="heroImagePreview" src="" alt="" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1.5px solid var(--gray-200);background:var(--gray-50);">
+              <div>
+                <input type="file" id="heroImageFileInput" accept="image/*" style="display:none;">
+                <button type="button" class="btn btn-outline btn-sm" id="uploadHeroImageBtn"><i class="fa-solid fa-upload"></i> Upload Photo</button>
+                <span id="heroImageUploadStatus" style="font-size:12px;color:var(--gray-500);margin-left:8px;"></span>
+                <p class="form-hint">Max 5MB. Or paste an image URL below instead.</p>
+              </div>
+            </div>
+            <input type="url" name="hero_image_url" id="heroImageUrlInput" placeholder="https://... or leave as uploaded photo above">
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Primary Button Text</label><input type="text" name="hero_cta_primary_text"></div>
+            <div class="form-group"><label>Primary Button Link</label><input type="text" name="hero_cta_primary_link"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Secondary Button Text</label><input type="text" name="hero_cta_secondary_text"></div>
+            <div class="form-group"><label>Secondary Button Link</label><input type="text" name="hero_cta_secondary_link"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="saveHeroBtn"><i class="fa-solid fa-check"></i> Save Hero</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-heading"></i> Homepage Section Headings</h3></div>
+        <form id="sectionsForm">
+          <div class="form-group"><label>Categories Section Heading</label><input type="text" name="categories_section_heading"></div>
+          <div class="form-group"><label>Popular Products Section Heading</label><input type="text" name="featured_section_heading"></div>
+          <div class="form-group"><label>Pre-order Section Heading</label><input type="text" name="preorder_section_heading"></div>
+          <div class="form-group"><label>Pre-order Section Subtext</label><input type="text" name="preorder_section_subtext"></div>
+          <button type="submit" class="btn btn-primary" id="saveSectionsBtn"><i class="fa-solid fa-check"></i> Save Section Headings</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-shield-halved"></i> Trust Badges (homepage)</h3></div>
+        <form id="trustForm">
+          <div style="border-bottom:1px solid var(--gray-200);padding-bottom:14px;margin-bottom:14px;">
+            <p style="font-size:12.5px;font-weight:700;color:var(--gray-500);margin:0 0 8px;">BADGE 1</p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Icon</label>
+                <div class="icon-field-row">
+                  <span class="icon-preview-badge"><i class="fa-solid fa-shield-halved" id="trustIconPreview1"></i></span>
+                  <input type="hidden" name="trust_badge_1_icon" id="trust_badge_1_icon">
+                  <button type="button" class="btn btn-outline btn-sm" data-icon-picker-btn="1"><i class="fa-solid fa-icons"></i> Choose</button>
+                </div>
+              </div>
+              <div class="form-group"><label>Title</label><input type="text" name="trust_badge_1_title"></div>
+            </div>
+            <div class="form-group"><label>Subtitle</label><input type="text" name="trust_badge_1_subtitle"></div>
+          </div>
+          <div style="border-bottom:1px solid var(--gray-200);padding-bottom:14px;margin-bottom:14px;">
+            <p style="font-size:12.5px;font-weight:700;color:var(--gray-500);margin:0 0 8px;">BADGE 2</p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Icon</label>
+                <div class="icon-field-row">
+                  <span class="icon-preview-badge"><i class="fa-solid fa-truck-fast" id="trustIconPreview2"></i></span>
+                  <input type="hidden" name="trust_badge_2_icon" id="trust_badge_2_icon">
+                  <button type="button" class="btn btn-outline btn-sm" data-icon-picker-btn="2"><i class="fa-solid fa-icons"></i> Choose</button>
+                </div>
+              </div>
+              <div class="form-group"><label>Title</label><input type="text" name="trust_badge_2_title"></div>
+            </div>
+            <div class="form-group"><label>Subtitle</label><input type="text" name="trust_badge_2_subtitle"></div>
+          </div>
+          <div>
+            <p style="font-size:12.5px;font-weight:700;color:var(--gray-500);margin:0 0 8px;">BADGE 3</p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Icon</label>
+                <div class="icon-field-row">
+                  <span class="icon-preview-badge"><i class="fa-solid fa-headset" id="trustIconPreview3"></i></span>
+                  <input type="hidden" name="trust_badge_3_icon" id="trust_badge_3_icon">
+                  <button type="button" class="btn btn-outline btn-sm" data-icon-picker-btn="3"><i class="fa-solid fa-icons"></i> Choose</button>
+                </div>
+              </div>
+              <div class="form-group"><label>Title</label><input type="text" name="trust_badge_3_title"></div>
+            </div>
+            <div class="form-group"><label>Subtitle</label><input type="text" name="trust_badge_3_subtitle"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:14px;" id="saveTrustBtn"><i class="fa-solid fa-check"></i> Save Trust Badges</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-shop"></i> Footer, Contact & Social</h3></div>
+        <form id="footerForm">
+          <div class="form-group"><label>Footer About Text</label><textarea name="footer_about_text" rows="2"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Contact Email</label><input type="email" name="contact_email"></div>
+            <div class="form-group"><label>Contact Phone</label><input type="text" name="contact_phone"></div>
+          </div>
+          <div class="form-group"><label>Contact Address</label><input type="text" name="contact_address"></div>
+          <div class="form-group"><label>WhatsApp Number (digits + country code, no +)</label><input type="text" name="whatsapp_number" placeholder="2348166292037"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Instagram URL</label><input type="url" name="social_instagram"></div>
+            <div class="form-group"><label>Facebook URL</label><input type="url" name="social_facebook"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>TikTok URL</label><input type="url" name="social_tiktok"></div>
+            <div class="form-group"><label>Twitter / X URL</label><input type="url" name="social_twitter"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="saveFooterBtn"><i class="fa-solid fa-check"></i> Save Footer & Contact</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/site-content.js"></script>
+<script src="../js/media-utils.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-layout.js"></script>
+<script src="js/icon-picker.js"></script>
+<script src="js/content-admin.js"></script>
+</body>
+</html>

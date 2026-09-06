@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amah Wigs — Women's Lifestyle & Activewear</title>
+<meta name="description" content="Shop women's lifestyle and casual activewear in stock now, or reserve upcoming drops with pre-orders.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="header-slot"></div>
+
+<main>
+  <!-- Hero -->
+  <div class="hero-wrap">
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <span class="hero-badge"><i class="fa-solid fa-bolt"></i> <span id="heroBadgeText">New arrivals every week</span></span>
+          <h1 id="heroHeading">Get it now, or reserve it early.</h1>
+          <p id="heroSubheading">Shop in-stock items that ship today or place a deposit to pre-order before everyone else. One store, two ways to shop.</p>
+          <div class="hero-actions">
+            <a href="shop.html?type=in_stock" class="btn btn-primary" id="heroPrimaryBtn">Shop In Stock <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="shop.html?type=pre_order" class="btn btn-outline" id="heroSecondaryBtn">Try pre-orders</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="images/hero-model-pink-set.jpg" alt="Featured product" id="heroImage">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Categories -->
+  <section class="section container">
+    <div class="section-head">
+      <div><h2 id="categoriesSectionHeading">Categories</h2></div>
+      <a href="shop.html" class="see-all-link">See all</a>
+    </div>
+    <div class="category-icons" id="categoryChips"></div>
+  </section>
+
+  <!-- Featured products -->
+  <section class="section container" style="padding-top:0;">
+    <div class="section-head">
+      <div>
+        <h2 id="featuredSectionHeading">Popular Products</h2>
+      </div>
+      <a href="shop.html" class="see-all-link">See all</a>
+    </div>
+    <div class="product-grid" id="featuredGrid">
+      <p style="color:var(--gray-500);">Loading products...</p>
+    </div>
+  </section>
+
+  <!-- Pre-order spotlight -->
+  <section class="section container" style="padding-top:0;">
+    <div class="section-head">
+      <div>
+        <h2 id="preorderSectionHeading">Pre-order</h2>
+      </div>
+      <a href="shop.html?type=pre_order" class="see-all-link">See all</a>
+    </div>
+    <p style="color:var(--gray-500); margin: -14px 0 22px; font-size:12.5px;" id="preorderSectionSubtext">Reserve products with a small deposit — pay the rest when it ships.</p>
+    <div class="product-grid" id="preorderGrid">
+      <p style="color:var(--gray-500);">Loading...</p>
+    </div>
+  </section>
+
+  <!-- Trust badges -->
+  <section class="container" style="padding: 0 24px 56px;">
+    <div class="trust-badges-row">
+      <div class="trust-badge-item">
+        <i class="fa-solid fa-shield-halved" id="trustBadge1Icon"></i>
+        <div><strong id="trustBadge1Title">Secure Payments</strong><span id="trustBadge1Subtitle">100% secure checkout</span></div>
+      </div>
+      <div class="trust-badge-item">
+        <i class="fa-solid fa-truck-fast" id="trustBadge2Icon"></i>
+        <div><strong id="trustBadge2Title">Fast Delivery</strong><span id="trustBadge2Subtitle">Quick nationwide delivery</span></div>
+      </div>
+      <div class="trust-badge-item">
+        <i class="fa-solid fa-headset" id="trustBadge3Icon"></i>
+        <div><strong id="trustBadge3Title">24/7 Support</strong><span id="trustBadge3Subtitle">We're here to help</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-slot"></div>
+<div id="bottom-nav-slot"></div>
+
+<script src="js/api.js"></script>
+<script src="js/site-content.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/wishlist.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/product-card.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

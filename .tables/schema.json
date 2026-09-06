@@ -1,0 +1,686 @@
+[
+  {
+    "name": "products",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique product id"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "description": "Product name"
+      },
+      {
+        "name": "description",
+        "type": "rich_text",
+        "description": "Product description"
+      },
+      {
+        "name": "price",
+        "type": "number",
+        "description": "Selling price"
+      },
+      {
+        "name": "compare_at_price",
+        "type": "number",
+        "description": "Original price for showing discount (optional, 0 if none)"
+      },
+      {
+        "name": "category",
+        "type": "text",
+        "description": "Product category"
+      },
+      {
+        "name": "image_url",
+        "type": "text",
+        "description": "Main image URL"
+      },
+      {
+        "name": "gallery",
+        "type": "array",
+        "description": "Additional image URLs"
+      },
+      {
+        "name": "stock_quantity",
+        "type": "number",
+        "description": "Units in stock (for in_stock items) or units available to pre-order"
+      },
+      {
+        "name": "product_type",
+        "type": "text",
+        "description": "Whether item ships now or is a pre-order",
+        "options": [
+          "in_stock",
+          "pre_order"
+        ]
+      },
+      {
+        "name": "status",
+        "type": "text",
+        "description": "Visible in store or hidden",
+        "options": [
+          "active",
+          "inactive"
+        ]
+      },
+      {
+        "name": "sku",
+        "type": "text",
+        "description": "Stock keeping unit code"
+      },
+      {
+        "name": "release_date",
+        "type": "text",
+        "description": "Expected release/ship date for pre-order items"
+      },
+      {
+        "name": "deposit_percent",
+        "type": "number",
+        "description": "Percent of price required as deposit for pre-order (0-100), 0 = full payment"
+      },
+      {
+        "name": "featured",
+        "type": "bool",
+        "description": "Show in featured section"
+      }
+    ]
+  },
+  {
+    "name": "orders",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique order id"
+      },
+      {
+        "name": "order_number",
+        "type": "text",
+        "description": "Human-friendly order number e.g. ORD-1001"
+      },
+      {
+        "name": "customer_name",
+        "type": "text",
+        "description": "Customer full name"
+      },
+      {
+        "name": "customer_email",
+        "type": "text",
+        "description": "Customer email"
+      },
+      {
+        "name": "customer_phone",
+        "type": "text",
+        "description": "Customer phone"
+      },
+      {
+        "name": "shipping_address",
+        "type": "rich_text",
+        "description": "Shipping address"
+      },
+      {
+        "name": "items",
+        "type": "rich_text",
+        "description": "JSON string of ordered line items (id, name, price, qty, type, image, variation)"
+      },
+      {
+        "name": "subtotal",
+        "type": "number",
+        "description": "Order subtotal"
+      },
+      {
+        "name": "total",
+        "type": "number",
+        "description": "Order total amount due now (deposit or full)"
+      },
+      {
+        "name": "order_type",
+        "type": "text",
+        "description": "Whether order contains in-stock, pre-order, or mixed items",
+        "options": [
+          "in_stock",
+          "pre_order",
+          "mixed"
+        ]
+      },
+      {
+        "name": "payment_status",
+        "type": "text",
+        "description": "Payment state",
+        "options": [
+          "pending",
+          "deposit_paid",
+          "paid",
+          "balance_due"
+        ]
+      },
+      {
+        "name": "fulfillment_status",
+        "type": "text",
+        "description": "Order fulfillment stage",
+        "options": [
+          "pending",
+          "processing",
+          "awaiting_stock",
+          "shipped",
+          "delivered",
+          "cancelled"
+        ]
+      },
+      {
+        "name": "notes",
+        "type": "rich_text",
+        "description": "Internal admin notes (coupon code/discount applied is recorded here as text)"
+      },
+      {
+        "name": "payment_method",
+        "type": "text",
+        "description": "How the customer paid",
+        "options": [
+          "card",
+          "bank_transfer",
+          "opay",
+          "offline"
+        ]
+      },
+      {
+        "name": "paystack_reference",
+        "type": "text",
+        "description": "Paystack transaction reference, for card/bank_transfer/opay payments verified via Paystack"
+      },
+      {
+        "name": "offline_receipt_url",
+        "type": "rich_text",
+        "description": "Compressed data-URL image of the payment receipt the customer uploaded for offline/manual bank transfer payments"
+      }
+    ]
+  },
+  {
+    "name": "settings",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Setting key id"
+      },
+      {
+        "name": "store_name",
+        "type": "text",
+        "description": "Store display name"
+      },
+      {
+        "name": "admin_username",
+        "type": "text",
+        "description": "Admin dashboard username"
+      },
+      {
+        "name": "admin_password",
+        "type": "text",
+        "description": "Admin dashboard password (demo only, not secure)"
+      },
+      {
+        "name": "currency_symbol",
+        "type": "text",
+        "description": "Currency symbol e.g. $"
+      },
+      {
+        "name": "paystack_public_key",
+        "type": "text",
+        "description": "Paystack public key (pk_...), used client-side to initialize Paystack Inline payments"
+      },
+      {
+        "name": "paystack_secret_key",
+        "type": "text",
+        "description": "Paystack secret key (sk_...). NOTE: stored in plain text in table data on this static site; do not treat as secure — used only for admin reference, never sent from the browser at checkout"
+      },
+      {
+        "name": "paystack_enabled",
+        "type": "bool",
+        "description": "Whether Paystack-powered payment methods (Card, Bank Transfer, Opay) are offered at checkout"
+      },
+      {
+        "name": "paystack_currency",
+        "type": "text",
+        "description": "3-letter currency code Paystack should charge in (must match your Paystack account's supported currency), e.g. NGN, GHS, ZAR, USD"
+      },
+      {
+        "name": "offline_payment_enabled",
+        "type": "bool",
+        "description": "Whether the manual/offline bank transfer payment method is offered at checkout"
+      },
+      {
+        "name": "offline_bank_name",
+        "type": "text",
+        "description": "Bank name shown to customers for manual/offline bank transfer"
+      },
+      {
+        "name": "offline_account_name",
+        "type": "text",
+        "description": "Account holder name shown to customers for manual/offline bank transfer"
+      },
+      {
+        "name": "offline_account_number",
+        "type": "text",
+        "description": "Account number shown to customers for manual/offline bank transfer"
+      },
+      {
+        "name": "offline_instructions",
+        "type": "rich_text",
+        "description": "Extra instructions shown to customers for manual/offline bank transfer (e.g. reference format)"
+      }
+    ]
+  },
+  {
+    "name": "categories",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique category id"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "description": "Category display name (must match products.category to link products)"
+      },
+      {
+        "name": "icon",
+        "type": "text",
+        "description": "Font Awesome icon class, e.g. fa-shirt"
+      },
+      {
+        "name": "image_url",
+        "type": "text",
+        "description": "Optional category image URL"
+      },
+      {
+        "name": "sort_order",
+        "type": "number",
+        "description": "Display order on homepage/shop (lower = first)"
+      },
+      {
+        "name": "status",
+        "type": "text",
+        "description": "Visible or hidden",
+        "options": [
+          "active",
+          "inactive"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "coupons",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique coupon id"
+      },
+      {
+        "name": "code",
+        "type": "text",
+        "description": "Coupon code customers enter at checkout (case-insensitive)"
+      },
+      {
+        "name": "discount_type",
+        "type": "text",
+        "description": "Percent or fixed amount discount",
+        "options": [
+          "percent",
+          "fixed"
+        ]
+      },
+      {
+        "name": "discount_value",
+        "type": "number",
+        "description": "Discount amount: percent (0-100) or fixed currency amount"
+      },
+      {
+        "name": "min_order",
+        "type": "number",
+        "description": "Minimum order subtotal required to use this coupon (0 = no minimum)"
+      },
+      {
+        "name": "max_uses",
+        "type": "number",
+        "description": "Maximum number of times this coupon can be used (0 = unlimited)"
+      },
+      {
+        "name": "used_count",
+        "type": "number",
+        "description": "How many times this coupon has been used so far"
+      },
+      {
+        "name": "expires_at",
+        "type": "text",
+        "description": "Expiry date (YYYY-MM-DD), empty = never expires"
+      },
+      {
+        "name": "active",
+        "type": "bool",
+        "description": "Whether the coupon can currently be used"
+      }
+    ]
+  },
+  {
+    "name": "site_content",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Always 'site_content' (single row)"
+      },
+      {
+        "name": "primary_color",
+        "type": "text",
+        "description": "Main brand color (hex), used for buttons/links/logo"
+      },
+      {
+        "name": "accent_color",
+        "type": "text",
+        "description": "Accent color (hex), used for pre-order badges/highlights"
+      },
+      {
+        "name": "dark_color",
+        "type": "text",
+        "description": "Dark color (hex), used for header/footer/sidebar background"
+      },
+      {
+        "name": "success_color",
+        "type": "text",
+        "description": "Success color (hex), used for in-stock/positive states"
+      },
+      {
+        "name": "danger_color",
+        "type": "text",
+        "description": "Danger color (hex), used for sale/out-of-stock states"
+      },
+      {
+        "name": "announcement_text",
+        "type": "text",
+        "description": "Top announcement bar text shown on every storefront page"
+      },
+      {
+        "name": "hero_badge_text",
+        "type": "text",
+        "description": "Small badge text above the homepage hero heading"
+      },
+      {
+        "name": "hero_heading",
+        "type": "text",
+        "description": "Homepage hero main heading"
+      },
+      {
+        "name": "hero_subheading",
+        "type": "text",
+        "description": "Homepage hero paragraph text"
+      },
+      {
+        "name": "hero_image_url",
+        "type": "text",
+        "description": "Homepage hero visual image URL"
+      },
+      {
+        "name": "hero_cta_primary_text",
+        "type": "text",
+        "description": "Primary hero button label"
+      },
+      {
+        "name": "hero_cta_primary_link",
+        "type": "text",
+        "description": "Primary hero button link"
+      },
+      {
+        "name": "hero_cta_secondary_text",
+        "type": "text",
+        "description": "Secondary hero button label"
+      },
+      {
+        "name": "hero_cta_secondary_link",
+        "type": "text",
+        "description": "Secondary hero button link"
+      },
+      {
+        "name": "trust_badge_1_icon",
+        "type": "text",
+        "description": "Font Awesome icon class for trust badge 1"
+      },
+      {
+        "name": "trust_badge_1_title",
+        "type": "text",
+        "description": "Title for trust badge 1"
+      },
+      {
+        "name": "trust_badge_1_subtitle",
+        "type": "text",
+        "description": "Subtitle for trust badge 1"
+      },
+      {
+        "name": "trust_badge_2_icon",
+        "type": "text",
+        "description": "Font Awesome icon class for trust badge 2"
+      },
+      {
+        "name": "trust_badge_2_title",
+        "type": "text",
+        "description": "Title for trust badge 2"
+      },
+      {
+        "name": "trust_badge_2_subtitle",
+        "type": "text",
+        "description": "Subtitle for trust badge 2"
+      },
+      {
+        "name": "trust_badge_3_icon",
+        "type": "text",
+        "description": "Font Awesome icon class for trust badge 3"
+      },
+      {
+        "name": "trust_badge_3_title",
+        "type": "text",
+        "description": "Title for trust badge 3"
+      },
+      {
+        "name": "trust_badge_3_subtitle",
+        "type": "text",
+        "description": "Subtitle for trust badge 3"
+      },
+      {
+        "name": "featured_section_heading",
+        "type": "text",
+        "description": "Homepage 'Popular Products' section heading"
+      },
+      {
+        "name": "preorder_section_heading",
+        "type": "text",
+        "description": "Homepage pre-order spotlight section heading"
+      },
+      {
+        "name": "preorder_section_subtext",
+        "type": "text",
+        "description": "Homepage pre-order spotlight section description"
+      },
+      {
+        "name": "categories_section_heading",
+        "type": "text",
+        "description": "Homepage categories section heading"
+      },
+      {
+        "name": "footer_about_text",
+        "type": "text",
+        "description": "Short about text shown in the footer"
+      },
+      {
+        "name": "contact_email",
+        "type": "text",
+        "description": "Public contact email"
+      },
+      {
+        "name": "contact_phone",
+        "type": "text",
+        "description": "Public contact phone number"
+      },
+      {
+        "name": "contact_address",
+        "type": "text",
+        "description": "Public contact/store address"
+      },
+      {
+        "name": "whatsapp_number",
+        "type": "text",
+        "description": "WhatsApp number (digits only, with country code) for the floating chat button"
+      },
+      {
+        "name": "social_instagram",
+        "type": "text",
+        "description": "Instagram profile URL"
+      },
+      {
+        "name": "social_facebook",
+        "type": "text",
+        "description": "Facebook page URL"
+      },
+      {
+        "name": "social_tiktok",
+        "type": "text",
+        "description": "TikTok profile URL"
+      },
+      {
+        "name": "social_twitter",
+        "type": "text",
+        "description": "Twitter/X profile URL"
+      },
+      {
+        "name": "free_shipping_threshold",
+        "type": "number",
+        "description": "Order subtotal above which shipping is free (0 = disabled)"
+      }
+    ]
+  },
+  {
+    "name": "product_media",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique media item id"
+      },
+      {
+        "name": "product_id",
+        "type": "text",
+        "description": "Owning product id"
+      },
+      {
+        "name": "media_type",
+        "type": "text",
+        "description": "image or video",
+        "options": [
+          "image",
+          "video"
+        ]
+      },
+      {
+        "name": "url",
+        "type": "text",
+        "description": "Media URL: hosted link, a compressed data URL for uploaded images, or empty when the video is stored chunked (see is_chunked)"
+      },
+      {
+        "name": "is_chunked",
+        "type": "bool",
+        "description": "True if this video's data is split across media_chunks rows (large uploaded videos) rather than stored in url"
+      },
+      {
+        "name": "sort_order",
+        "type": "number",
+        "description": "Display order within the product gallery (lower = first)"
+      }
+    ]
+  },
+  {
+    "name": "product_variations",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique variation group id"
+      },
+      {
+        "name": "product_id",
+        "type": "text",
+        "description": "Owning product id"
+      },
+      {
+        "name": "group_name",
+        "type": "text",
+        "description": "Variation group name, e.g. Color or Size"
+      },
+      {
+        "name": "group_values",
+        "type": "array",
+        "description": "List of option values for this group, e.g. ['Red','Blue','Green']"
+      },
+      {
+        "name": "sort_order",
+        "type": "number",
+        "description": "Display order of this group on the product page"
+      }
+    ]
+  },
+  {
+    "name": "order_tracking_notes",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique note id"
+      },
+      {
+        "name": "order_id",
+        "type": "text",
+        "description": "Order this update belongs to"
+      },
+      {
+        "name": "message",
+        "type": "text",
+        "description": "Customer-visible tracking update message shown on the Track Order page"
+      }
+    ]
+  },
+  {
+    "name": "size_test_rt",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "media_chunks",
+    "fields": [
+      {
+        "name": "id",
+        "type": "text",
+        "description": "Unique chunk id"
+      },
+      {
+        "name": "media_id",
+        "type": "text",
+        "description": "The product_media row this chunk belongs to"
+      },
+      {
+        "name": "chunk_index",
+        "type": "number",
+        "description": "Order of this chunk (0-based) — chunks are joined in this order to reconstruct the full video data URL"
+      },
+      {
+        "name": "chunk_data",
+        "type": "rich_text",
+        "description": "A slice of the base64 video data URL (kept under the per-field size cap)"
+      }
+    ]
+  }
+]

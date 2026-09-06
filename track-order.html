@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Your Order — Amah Wigs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="header-slot"></div>
+
+<main class="container">
+  <div class="breadcrumbs"><a href="index.html">Home</a> / <span>Track Order</span></div>
+
+  <div class="track-box">
+    <h1 style="font-size:24px;font-weight:800;text-align:center;margin:0 0 8px;">Track Your Order</h1>
+    <p style="color:var(--gray-500);text-align:center;margin:0 0 24px;">Enter your order number and email to check its status.</p>
+
+    <form id="trackForm" class="checkout-section">
+      <div class="form-group">
+        <label>Order Number *</label>
+        <input type="text" name="order_number" placeholder="e.g. ORD-1234-5678" required>
+      </div>
+      <div class="form-group">
+        <label>Email Used at Checkout *</label>
+        <input type="email" name="email" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="trackBtn">
+        <i class="fa-solid fa-magnifying-glass"></i> Track Order
+      </button>
+    </form>
+
+    <div id="trackResult" style="margin-top:26px;"></div>
+  </div>
+</main>
+
+<div id="footer-slot"></div>
+<div id="bottom-nav-slot"></div>
+
+<script src="js/api.js"></script>
+<script src="js/site-content.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/wishlist.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/track-order.js"></script>
+</body>
+</html>
