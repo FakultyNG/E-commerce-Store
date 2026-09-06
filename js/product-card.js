@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Product card rendering helper
+   WigsbyAmah — Product card rendering helper
    ========================================================================== */
 
 function productCardHtml(p, symbol) {

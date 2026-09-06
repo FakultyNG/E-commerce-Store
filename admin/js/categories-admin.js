@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Admin Categories CRUD logic
+   WigsbyAmah — Admin Categories CRUD logic
    ========================================================================== */
 
 let __adminCategories = [];

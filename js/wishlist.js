@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Wishlist management (localStorage based)
+   WigsbyAmah — Wishlist management (localStorage based)
    ========================================================================== */
 
 const WISHLIST_KEY = 'femaura_wishlist_v1';

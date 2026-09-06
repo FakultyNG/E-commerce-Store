@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Shared header/footer/bottom-nav injection for storefront pages
+   WigsbyAmah — Shared header/footer/bottom-nav injection for storefront pages
    ========================================================================== */
 
 function renderHeader(activePage) {
@@ -18,7 +18,7 @@ function renderHeader(activePage) {
     <!-- (announcement bar text above is overwritten by applySiteContentToDom() once site_content loads) -->
     <!-- Desktop row -->
     <div class="header-inner">
-      <a href="index.html" class="logo">Amah Wigs</a>
+      <a href="index.html" class="logo">WigsbyAmah</a>
       <nav class="main-nav">${navHtml}</nav>
       <form class="search-box" onsubmit="event.preventDefault(); window.location.href='shop.html?q=' + encodeURIComponent(this.q.value);">
         <i class="fa-solid fa-magnifying-glass" style="color:#9ca3af;font-size:13px;"></i>
@@ -40,7 +40,7 @@ function renderHeader(activePage) {
     <!-- Mobile top bar: hamburger — centered logo — cart -->
     <div class="header-top-mobile">
       <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
-      <a href="index.html" class="logo-mobile"><span class="logo-mobile-text">Amah Wigs</span></a>
+      <a href="index.html" class="logo-mobile"><span class="logo-mobile-text">WigsbyAmah</span></a>
       <a href="cart.html" class="cart-icon-mobile" aria-label="Cart">
         <i class="fa-solid fa-cart-shopping"></i>
         <span class="cart-badge cart-count" style="display:none;">0</span>
@@ -68,7 +68,7 @@ function renderFooter() {
   <footer class="site-footer">
     <div class="footer-grid">
       <div>
-        <h4>Amah Wigs</h4>
+        <h4>WigsbyAmah</h4>
         <p id="footerAboutText" style="font-size:14px;color:#9ca3af;max-width:280px;">Women's lifestyle & casual activewear — available now, or reserved ahead with pre-orders on upcoming releases.</p>
         <ul id="footerContactInfo" style="margin-top:12px;"></ul>
         <div id="footerSocialLinks" style="display:none;font-size:18px;margin-top:12px;"></div>
@@ -96,7 +96,7 @@ function renderFooter() {
         </ul>
       </div>
     </div>
-    <div class="footer-bottom">© 2026 Amah Wigs. All rights reserved.</div>
+    <div class="footer-bottom">© 2026 WigsbyAmah. All rights reserved.</div>
   </footer>`;
 }
 
@@ -122,7 +122,7 @@ function renderBottomNav(activePage) {
 
 function renderWhatsAppButton() {
   const phone = '2348166292037';
-  const message = encodeURIComponent("Hi! I have a question about a product on Amah Wigs.");
+  const message = encodeURIComponent("Hi! I have a question about a product on WigsbyAmah.");
   return `<a href="https://wa.me/${phone}?text=${message}" class="whatsapp-float-btn" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>`;
 }
 

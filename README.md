@@ -1,4 +1,4 @@
-# Amah Wigs — Women's Lifestyle & Activewear Store (Stocked & Pre-Order)
+# WigsbyAmah — Women's Lifestyle & Activewear Store (Stocked & Pre-Order)
 
 A static e-commerce storefront selling **women's lifestyle and casual activewear clothing** — both **in-stock products (ship now)** and **pre-order products (reserve now, ship later)** — with a simple, password-guarded **Admin Dashboard** to manage products, orders, and store settings — all built with HTML, CSS, JavaScript, and the RESTful Table API (no backend server).
 
@@ -38,7 +38,7 @@ The storefront now uses a **minimal black/white "app style" theme** modeled on a
 - **Account** (`account.html`) — app-style account/menu page (bottom-nav "Account" destination).
 
 ### Admin Dashboard (`/admin`)
-- **Branding** — the "Amah Wigs" text logo is used across the storefront header/footer and the admin login/sidebar.
+- **Branding** — the "WigsbyAmah" text logo is used across the storefront header/footer and the admin login/sidebar.
 - **Login** (`admin/login.html`) — username/password gate stored in the `settings` table (client-side demo auth only — see Security Note below).
 - **Dashboard** (`admin/index.html`) — KPI cards, 7-day revenue line chart, order-type doughnut chart (Chart.js), recent orders table, low-stock alert table.
 - **Products** (`admin/products.html`) — full CRUD, plus:

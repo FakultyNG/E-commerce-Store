@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Home page logic
+   WigsbyAmah — Home page logic
    ========================================================================== */
 
 // Best-effort icon mapping for category names -> Font Awesome icons

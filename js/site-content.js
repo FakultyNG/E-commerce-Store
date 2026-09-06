@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Site content & theme loader (colors, hero, trust badges,
+   WigsbyAmah — Site content & theme loader (colors, hero, trust badges,
    announcement bar, footer/contact/social) shared by every storefront page.
    ========================================================================== */
 
@@ -168,7 +168,7 @@ function applySiteContentToDom(content) {
 
   const waBtn = document.getElementById('whatsappFloatBtn');
   if (waBtn && content.whatsapp_number) {
-    const message = encodeURIComponent(`Hi! I have a question about a product on Amah Wigs.`);
+    const message = encodeURIComponent(`Hi! I have a question about a product on WigsbyAmah.`);
     waBtn.setAttribute('href', `https://wa.me/${content.whatsapp_number}?text=${message}`);
   }
 }

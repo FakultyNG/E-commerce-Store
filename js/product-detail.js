@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Product detail page logic
+   WigsbyAmah — Product detail page logic
    Supports a multi-photo/video gallery (from product_media) and
    color/size-style variation groups (from product_variations).
    ========================================================================== */
@@ -145,7 +145,7 @@ function renderPdp(p, symbol, media, variations) {
   const depositAmt = isPreorder && p.deposit_percent > 0 ? (activePrice * p.deposit_percent / 100) : activePrice;
 
   document.getElementById('crumbName').textContent = p.name;
-  document.title = `${p.name} — Amah Wigs`;
+  document.title = `${p.name} — WigsbyAmah`;
 
   let stockLine = '';
   if (isPreorder) {

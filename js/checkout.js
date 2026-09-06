@@ -1,21 +1,17 @@
 /* ==========================================================================
-   Amah Wigs — Checkout page logic (coupon codes + real payment methods)
+   WigsbyAmah — Checkout page logic (coupon codes + real payment methods)
 
    Payment methods offered (each gated by admin Settings toggles):
    - Credit/Debit Card    -> Paystack Inline, channels: ['card']
    - Bank Transfer        -> Paystack Inline, channels: ['bank_transfer','bank']
-   - Opay                 -> Paystack Inline, channels: ['mobile_money','bank_transfer']
-     (Paystack has no distinct "Opay" channel in its Inline API; Opay wallet/
-     bank payments route through Paystack's mobile_money/bank channels
-     depending on the customer's bank — this is the closest faithful mapping.)
+   - Opay                 -> server-side Paystack transaction initialize,
+     restricted to Paystack's bank/direct-debit-style checkout redirect.
    - Offline Payment      -> admin-configured bank details shown to the
      customer; customer uploads a receipt image (compressed client-side)
      which is stored with the order for manual admin confirmation.
 
-   NOTE: this is a static site with no backend, so Paystack payments are
-   confirmed via the customer's browser callback only — there is no
-   server-side transaction verification against the secret key. Treat this
-   as "customer-confirmed" rather than fully server-verified.
+   NOTE: Opay uses the cPanel PHP backend so the Paystack secret key is not
+   exposed in browser JavaScript.
    ========================================================================== */
 
 let __appliedCoupon = null; // { code, discount_type, discount_value, id }
@@ -41,7 +37,7 @@ function paymentMethodOptions(settings) {
   if (settings.paystack_enabled && settings.paystack_public_key) {
     opts.push({ key: 'card', label: 'Credit / Debit Card', sub: 'Pay securely with your card via Paystack', icon: 'fa-credit-card' });
     opts.push({ key: 'bank_transfer', label: 'Bank Transfer', sub: 'Pay by transfer from your bank app via Paystack', icon: 'fa-building-columns' });
-    opts.push({ key: 'opay', label: 'Opay', sub: 'Pay directly from your Opay wallet via Paystack', icon: 'fa-wallet' });
+    opts.push({ key: 'opay', label: 'Opay', sub: 'Open the Paystack direct debit payment flow', icon: 'fa-wallet' });
   }
   if (settings.offline_payment_enabled) {
     opts.push({ key: 'offline', label: 'Offline Payment', sub: 'Manual bank transfer — upload your receipt', icon: 'fa-money-bill-transfer' });
@@ -191,13 +187,24 @@ function renderPaymentMethodPanel(method, settings) {
   __offlineReceiptDataUrl = '';
   if (!panel) return;
 
-  if (method === 'card' || method === 'bank_transfer' || method === 'opay') {
-    const labelMap = { card: 'card', bank_transfer: 'bank transfer', opay: 'Opay wallet' };
+  if (method === 'card' || method === 'bank_transfer') {
+    const labelMap = { card: 'card', bank_transfer: 'bank transfer' };
     panel.innerHTML = `
       <div class="payment-method-panel">
         <p style="margin:0;font-size:13px;color:var(--gray-700);">
           <i class="fa-solid fa-shield-halved" style="color:var(--success);"></i>
           You'll be securely redirected to Paystack to complete your ${labelMap[method]} payment when you click "Place Order" below.
+        </p>
+      </div>`;
+    return;
+  }
+
+  if (method === 'opay') {
+    panel.innerHTML = `
+      <div class="payment-method-panel">
+        <p style="margin:0;font-size:13px;color:var(--gray-700);">
+          <i class="fa-solid fa-shield-halved" style="color:var(--success);"></i>
+          You'll be sent directly to Paystack's direct debit payment page for this order.
         </p>
       </div>`;
     return;
@@ -375,8 +382,18 @@ async function finalizeOrder(orderPayload) {
 function paystackChannelsFor(method) {
   if (method === 'card') return ['card'];
   if (method === 'bank_transfer') return ['bank_transfer', 'bank'];
-  if (method === 'opay') return ['mobile_money', 'bank_transfer', 'bank'];
   return undefined;
+}
+
+async function postPaystackAction(action, payload) {
+  const res = await fetch(`${__API_BASE}api/paystack.php?action=${encodeURIComponent(action)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.status) throw new Error(data.message || 'Paystack request failed');
+  return data;
 }
 
 async function handlePlaceOrder(e, settings, dueNow, subtotal, discount) {
@@ -387,7 +404,46 @@ async function handlePlaceOrder(e, settings, dueNow, subtotal, discount) {
 
   const hasPaystackMethods = settings.paystack_enabled && settings.paystack_public_key;
 
-  if ((method === 'card' || method === 'bank_transfer' || method === 'opay') && hasPaystackMethods) {
+  if (method === 'opay' && hasPaystackMethods) {
+    const fd = new FormData(form);
+    const email = fd.get('customer_email');
+    if (!email) { showToast('Please enter your email.', 'fa-triangle-exclamation'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening Opay payment...';
+
+    const orderPayload = buildOrderPayload(fd, dueNow, subtotal, discount, 'opay', {
+      payment_status: Cart.orderType() === 'in_stock' ? 'paid' : 'deposit_paid',
+      fulfillment_status: Cart.orderType() === 'pre_order' ? 'awaiting_stock' : 'pending',
+      notes: __appliedCoupon ? `Coupon applied: ${__appliedCoupon.code}` : ''
+    });
+
+    try {
+      const callbackUrl = new URL('order-success.html', window.location.href);
+      callbackUrl.searchParams.set('paystack_pending', '1');
+      callbackUrl.searchParams.set('reference', orderPayload.order_number);
+
+      const init = await postPaystackAction('initialize-opay-direct-debit', {
+        email,
+        amount: Math.max(100, Math.round(dueNow * 100)),
+        reference: orderPayload.order_number,
+        callback_url: callbackUrl.toString(),
+        customer_name: orderPayload.customer_name
+      });
+
+      orderPayload.paystack_reference = init.reference || orderPayload.order_number;
+      sessionStorage.setItem('pendingPaystackOrderPayload', JSON.stringify(orderPayload));
+      window.location.href = init.authorization_url;
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Could not open Opay payment. Please try again.', 'fa-triangle-exclamation');
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-lock"></i> Place Order — ${fmtPrice(dueNow, window.__currencySymbol)} due now`;
+    }
+    return;
+  }
+
+  if ((method === 'card' || method === 'bank_transfer') && hasPaystackMethods) {
     if (typeof PaystackPop === 'undefined') {
       showToast('Payment library failed to load. Check your connection and try again.', 'fa-triangle-exclamation');
       return;

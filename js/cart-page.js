@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Cart page logic
+   WigsbyAmah — Cart page logic
    ========================================================================== */
 
 function formatVariation(variation) {

@@ -18,7 +18,7 @@ function renderAdminSidebar(active) {
 
   return `
     <div class="admin-logo">
-      <a href="index.html" class="admin-logo-text">Amah Wigs</a>
+      <a href="index.html" class="admin-logo-text">WigsbyAmah</a>
       <button type="button" class="admin-sidebar-close" id="sidebarCloseBtn" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <nav class="admin-nav">${navHtml}</nav>

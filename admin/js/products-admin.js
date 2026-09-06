@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Admin Products CRUD logic
+   WigsbyAmah — Admin Products CRUD logic
    Includes: photo/video upload (client-side compressed/chunked to fit the
    Table API's per-field size cap — see js/media-utils.js), drag-to-reorder
    gallery, color/size variation groups editor, and a category picker with

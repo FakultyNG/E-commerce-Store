@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Confirmed — Amah Wigs</title>
+<title>Order Confirmed — WigsbyAmah</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/style.css">
@@ -35,8 +35,58 @@
 <script src="js/wishlist.js"></script>
 <script src="js/layout.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+async function completePendingPaystackOrder(reference) {
+  const raw = sessionStorage.getItem('pendingPaystackOrderPayload');
+  if (!raw) return false;
+
+  const orderPayload = JSON.parse(raw);
+  const verifyRes = await fetch(`${__API_BASE}api/paystack.php?action=verify-transaction&reference=${encodeURIComponent(reference || orderPayload.paystack_reference || orderPayload.order_number)}`);
+  const verify = await verifyRes.json().catch(() => ({}));
+  if (!verifyRes.ok || !verify.status || !verify.paid) {
+    throw new Error(verify.message || 'Payment could not be verified.');
+  }
+
+  orderPayload.paystack_reference = verify.reference || orderPayload.paystack_reference || reference;
+  const items = JSON.parse(orderPayload.items || '[]');
+  for (const item of items) {
+    if (item.type === 'pre_order') continue;
+    try {
+      const product = await API.get('products', item.id);
+      const newQty = Math.max(0, (product.stock_quantity || 0) - item.qty);
+      await API.update('products', item.id, { stock_quantity: newQty });
+    } catch (err) { console.warn('Stock update failed for', item.id, err); }
+  }
+
+  try {
+    await API.create('orders', orderPayload);
+  } catch (err) {
+    await API.update('orders', orderPayload.id, orderPayload);
+  }
+
+  Cart.clear();
+  sessionStorage.setItem('lastOrderNumber', orderPayload.order_number);
+  sessionStorage.setItem('lastOrderEmail', orderPayload.customer_email);
+  sessionStorage.removeItem('pendingPaystackOrderPayload');
+  return true;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   initLayout('');
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('paystack_pending') === '1') {
+    document.getElementById('successMsg').textContent = 'Verifying your payment...';
+    document.getElementById('orderNumberBox').textContent = 'Please wait';
+    try {
+      await completePendingPaystackOrder(params.get('reference'));
+      window.history.replaceState({}, '', 'order-success.html');
+    } catch (err) {
+      console.error(err);
+      document.getElementById('orderNumberBox').textContent = 'Payment not verified';
+      document.getElementById('successMsg').textContent = err.message || 'We could not verify your payment. Please contact support if you were debited.';
+      return;
+    }
+  }
+
   const orderNumber = sessionStorage.getItem('lastOrderNumber');
   if (orderNumber) {
     document.getElementById('orderNumberBox').textContent = orderNumber;

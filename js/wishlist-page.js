@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Wishlist page logic
+   WigsbyAmah — Wishlist page logic
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', async () => {

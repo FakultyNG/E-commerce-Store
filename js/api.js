@@ -99,7 +99,7 @@ async function getSettings() {
     __settingsCache = s;
     return s;
   } catch (e) {
-    __settingsCache = { store_name: 'Amah Wigs', currency_symbol: '$', admin_username: 'admin', admin_password: 'admin123' };
+    __settingsCache = { store_name: 'WigsbyAmah', currency_symbol: '$', admin_username: 'admin', admin_password: 'admin123' };
     return __settingsCache;
   }
 }

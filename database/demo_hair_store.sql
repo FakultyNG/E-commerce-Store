@@ -55,7 +55,7 @@ CREATE TABLE `orders` (
 
 CREATE TABLE `settings` (
   `id` varchar(80) NOT NULL,
-  `store_name` varchar(255) DEFAULT 'Amah Wigs',
+  `store_name` varchar(255) DEFAULT 'WigsbyAmah',
   `admin_username` varchar(120) DEFAULT 'admin',
   `admin_password` varchar(120) DEFAULT 'admin123',
   `currency_symbol` varchar(20) DEFAULT 'NGN ',
@@ -65,7 +65,7 @@ CREATE TABLE `settings` (
   `paystack_currency` varchar(10) DEFAULT 'NGN',
   `offline_payment_enabled` tinyint(1) NOT NULL DEFAULT 1,
   `offline_bank_name` varchar(160) DEFAULT 'Demo Bank',
-  `offline_account_name` varchar(160) DEFAULT 'Amah Wigs',
+  `offline_account_name` varchar(160) DEFAULT 'WigsbyAmah',
   `offline_account_number` varchar(80) DEFAULT '0000000000',
   `offline_instructions` mediumtext,
   PRIMARY KEY (`id`)
@@ -182,10 +182,10 @@ CREATE TABLE `size_test_rt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `settings` (`id`, `store_name`, `admin_username`, `admin_password`, `currency_symbol`, `paystack_enabled`, `paystack_currency`, `offline_payment_enabled`, `offline_bank_name`, `offline_account_name`, `offline_account_number`, `offline_instructions`) VALUES
-('store_settings', 'Amah Wigs', 'admin', 'admin123', 'NGN ', 0, 'NGN', 1, 'Demo Bank', 'Amah Wigs', '0000000000', 'Use your order number as the transfer reference, then upload your receipt at checkout.');
+('store_settings', 'WigsbyAmah', 'admin', 'admin123', 'NGN ', 0, 'NGN', 1, 'Demo Bank', 'WigsbyAmah', '0000000000', 'Use your order number as the transfer reference, then upload your receipt at checkout.');
 
 INSERT INTO `site_content` (`id`, `announcement_text`, `hero_badge_text`, `hero_heading`, `hero_subheading`, `hero_image_url`, `hero_cta_primary_text`, `hero_cta_primary_link`, `hero_cta_secondary_text`, `hero_cta_secondary_link`, `featured_section_heading`, `preorder_section_heading`, `preorder_section_subtext`, `categories_section_heading`, `footer_about_text`, `contact_email`, `contact_phone`, `whatsapp_number`, `free_shipping_threshold`) VALUES
-('site_content', 'Free delivery on orders over NGN 150000 | New wig drops every week', 'Ready-to-wear hair essentials', 'Amah Wigs', 'Shop lace wigs, bundles, care products, and styling tools for polished everyday installs.', 'https://placehold.co/1200x850/e9d5c0/111111?text=Amah+Wigs', 'Shop Hair', 'shop.html', 'View Pre-Orders', 'shop.html?type=pre_order', 'Popular Hair Products', 'Pre-order Wigs', 'Reserve selected premium units with a deposit before they arrive.', 'Shop Categories', 'Quality wigs, bundles, hair care, and styling tools for everyday beauty.', 'hello@example.com', '+234 800 000 0000', '2348000000000', 150000.00);
+('site_content', 'Free delivery on orders over NGN 150000 | New wig drops every week', 'Ready-to-wear hair essentials', 'WigsbyAmah', 'Shop lace wigs, bundles, care products, and styling tools for polished everyday installs.', 'https://placehold.co/1200x850/e9d5c0/111111?text=WigsbyAmah', 'Shop Hair', 'shop.html', 'View Pre-Orders', 'shop.html?type=pre_order', 'Popular Hair Products', 'Pre-order Wigs', 'Reserve selected premium units with a deposit before they arrive.', 'Shop Categories', 'Quality wigs, bundles, hair care, and styling tools for everyday beauty.', 'hello@example.com', '+234 800 000 0000', '2348000000000', 150000.00);
 
 INSERT INTO `categories` (`id`, `name`, `icon`, `image_url`, `sort_order`, `status`) VALUES
 ('cat_lace_front', 'Lace Front Wigs', 'fa-user', 'https://placehold.co/600x600/f3e8ff/111111?text=Lace+Front', 1, 'active'),

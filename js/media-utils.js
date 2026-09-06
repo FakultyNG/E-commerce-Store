@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Shared media upload helpers (image compression, video
+   WigsbyAmah — Shared media upload helpers (image compression, video
    chunking) used by admin/js/products-admin.js, admin/js/content-admin.js,
    and the storefront product-detail page.
 

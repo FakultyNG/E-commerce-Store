@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Admin "Theme & Content" logic
+   WigsbyAmah — Admin "Theme & Content" logic
    Loads (or lazily creates) the single `site_content` row and wires up the
    5 forms: Colors, Announcement, Hero, Trust Badges, Footer/Contact/Social.
    ========================================================================== */

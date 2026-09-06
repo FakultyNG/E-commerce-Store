@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Amah Wigs — Shared searchable Font Awesome icon picker.
+   WigsbyAmah — Shared searchable Font Awesome icon picker.
    Wire any "Choose Icon" button + hidden text input + preview <i> element
    with wireIconPicker(button, hiddenInput, previewIconEl). Clicking the
    button opens a modal grid of common icons with a live search box; the
