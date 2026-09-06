@@ -214,9 +214,13 @@ table.admin-table tr:hover td { background: var(--gray-50); }
 .variation-group-card .vg-head input { flex: 1; }
 .variation-group-card .vg-values-row { display: flex; gap: 8px; }
 .variation-group-card .vg-values-row input { flex: 1; }
+.variation-group-card .vg-values-row input[type="number"] { flex: 0 0 140px; }
+.variation-group-card .vg-values-row .btn { flex-shrink: 0; }
 .variation-group-card .vg-remove { background: none; border: none; color: var(--danger); font-size: 15px; padding: 6px; }
+.vg-price-toggle { margin: 2px 0 8px; font-size: 12.5px; }
 .vg-chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .vg-chip { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--gray-200); border-radius: 999px; padding: 4px 10px 4px 12px; font-size: 12.5px; font-weight: 600; }
+.vg-chip em { color: var(--primary); font-style: normal; font-size: 11.5px; }
 .vg-chip button { background: none; border: none; color: var(--gray-400); font-size: 12px; padding: 0; }
 .vg-chip button:hover { color: var(--danger); }
 

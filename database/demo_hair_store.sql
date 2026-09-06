@@ -162,6 +162,7 @@ CREATE TABLE `product_variations` (
   `product_id` varchar(80) NOT NULL,
   `group_name` varchar(120) NOT NULL,
   `group_values` mediumtext,
+  `variant_prices` mediumtext,
   `sort_order` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`)
@@ -217,14 +218,14 @@ INSERT INTO `product_media` (`id`, `product_id`, `media_type`, `url`, `is_chunke
 ('pm_hair_009', 'hair_009', 'image', 'https://placehold.co/900x1100/fef3c7/111111?text=Professional+Hot+Comb', 0, 0),
 ('pm_hair_010', 'hair_010', 'image', 'https://placehold.co/900x1100/ffedd5/111111?text=613+Blonde+Pre-Order', 0, 0);
 
-INSERT INTO `product_variations` (`id`, `product_id`, `group_name`, `group_values`, `sort_order`) VALUES
-('pv_hair_001_length', 'hair_001', 'Length', '["16 inch","18 inch","20 inch"]', 0),
-('pv_hair_002_length', 'hair_002', 'Length', '["18 inch","20 inch","22 inch"]', 0),
-('pv_hair_003_length', 'hair_003', 'Length', '["14 inch","16 inch","18 inch"]', 0),
-('pv_hair_004_length', 'hair_004', 'Length', '["10 inch","12 inch","14 inch"]', 0),
-('pv_hair_005_length', 'hair_005', 'Length', '["18 inch","20 inch","22 inch"]', 0),
-('pv_hair_006_length', 'hair_006', 'Length', '["20 inch","22 inch","24 inch"]', 0),
-('pv_hair_010_length', 'hair_010', 'Length', '["20 inch","22 inch","24 inch"]', 0);
+INSERT INTO `product_variations` (`id`, `product_id`, `group_name`, `group_values`, `variant_prices`, `sort_order`) VALUES
+('pv_hair_001_length', 'hair_001', 'Length', '["16 inch","18 inch","20 inch"]', '{"16 inch":185000,"18 inch":205000,"20 inch":225000}', 0),
+('pv_hair_002_length', 'hair_002', 'Length', '["18 inch","20 inch","22 inch"]', '{"18 inch":220000,"20 inch":245000,"22 inch":270000}', 0),
+('pv_hair_003_length', 'hair_003', 'Length', '["14 inch","16 inch","18 inch"]', '{"14 inch":165000,"16 inch":185000,"18 inch":205000}', 0),
+('pv_hair_004_length', 'hair_004', 'Length', '["10 inch","12 inch","14 inch"]', '{"10 inch":145000,"12 inch":160000,"14 inch":175000}', 0),
+('pv_hair_005_length', 'hair_005', 'Length', '["18 inch","20 inch","22 inch"]', '{"18 inch":95000,"20 inch":110000,"22 inch":125000}', 0),
+('pv_hair_006_length', 'hair_006', 'Length', '["20 inch","22 inch","24 inch"]', '{"20 inch":135000,"22 inch":155000,"24 inch":175000}', 0),
+('pv_hair_010_length', 'hair_010', 'Length', '["20 inch","22 inch","24 inch"]', '{"20 inch":255000,"22 inch":285000,"24 inch":315000}', 0);
 
 INSERT INTO `coupons` (`id`, `code`, `discount_type`, `discount_value`, `min_order`, `max_uses`, `used_count`, `expires_at`, `active`) VALUES
 ('coupon_welcome10', 'WELCOME10', 'percent', 10.00, 50000.00, 100, 0, '', 1);

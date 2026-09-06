@@ -623,6 +623,11 @@
         "description": "List of option values for this group, e.g. ['Red','Blue','Green']"
       },
       {
+        "name": "variant_prices",
+        "type": "rich_text",
+        "description": "JSON object mapping variation option values to final product prices, e.g. {\"18 inch\": 205000}"
+      },
+      {
         "name": "sort_order",
         "type": "number",
         "description": "Display order of this group on the product page"

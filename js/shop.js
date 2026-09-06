@@ -3,6 +3,7 @@
    ========================================================================== */
 
 let __allProducts = [];
+let __allVariations = [];
 
 function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
@@ -39,6 +40,19 @@ function applyFiltersAndRender() {
   grid.innerHTML = filtered.map(p => productCardHtml(p, window.__currencySymbol)).join('');
 }
 
+function productMaxFilterPrice(product) {
+  const basePrice = Number(product.price || 0);
+  const variantPrices = __allVariations
+    .filter(v => v.product_id === product.id && v.variant_prices && typeof v.variant_prices === 'object')
+    .flatMap(v => Object.values(v.variant_prices).map(Number).filter(price => price > 0));
+  return Math.max(basePrice, ...variantPrices);
+}
+
+function updatePriceRangeLabel() {
+  const priceRange = document.getElementById('priceRange');
+  document.getElementById('priceRangeVal').textContent = fmtPrice(Number(priceRange.value || 0), window.__currencySymbol);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   initLayout('shop');
   const settings = await getSettings();
@@ -50,6 +64,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error(e);
     document.getElementById('productGrid').innerHTML = '<p style="color:var(--danger);">Could not load products.</p>';
     return;
+  }
+
+  try {
+    __allVariations = await API.listAll('product_variations');
+  } catch (e) {
+    __allVariations = [];
   }
 
   // Build category filters — prefer admin-managed categories (with custom
@@ -72,11 +92,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Set max price range based on data
-  const maxPriceInData = Math.max(...__allProducts.map(p => p.price), 100);
+  const maxPriceInData = Math.max(...__allProducts.map(productMaxFilterPrice), 100);
   const priceRange = document.getElementById('priceRange');
-  priceRange.max = Math.ceil(maxPriceInData / 10) * 10;
+  priceRange.max = Math.ceil(maxPriceInData / 1000) * 1000;
+  priceRange.step = '1000';
   priceRange.value = priceRange.max;
-  document.getElementById('priceRangeVal').textContent = priceRange.value;
+  updatePriceRangeLabel();
 
   // Apply URL params
   const typeParam = getQueryParam('type');
@@ -110,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     el.addEventListener('change', applyFiltersAndRender)
   );
   priceRange.addEventListener('input', () => {
-    document.getElementById('priceRangeVal').textContent = priceRange.value;
+    updatePriceRangeLabel();
     applyFiltersAndRender();
   });
   document.getElementById('sortSelect').addEventListener('change', applyFiltersAndRender);
@@ -118,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('input[name="type"][value=""]').checked = true;
     document.querySelector('input[name="category"][value=""]').checked = true;
     priceRange.value = priceRange.max;
-    document.getElementById('priceRangeVal').textContent = priceRange.value;
+    updatePriceRangeLabel();
     document.getElementById('sortSelect').value = 'default';
     window.history.replaceState({}, '', 'shop.html');
     applyFiltersAndRender();

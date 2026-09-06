@@ -17,7 +17,7 @@ let __adminCategoriesCache = [];
 // Each media item: { id, media_type: 'image'|'video', url, is_chunked, _file (pending File to upload), sort_order, _isNew, _deleted }
 let __currentMedia = [];
 let __deletedMediaIds = [];
-// Each variation group: { id, group_name, group_values: [...], sort_order, _isNew, _deleted }
+// Each variation group: { id, group_name, group_values: [...], variant_prices: { [value]: price }, sort_order, _isNew, _deleted }
 let __currentVariations = [];
 let __deletedVariationIds = [];
 
@@ -355,20 +355,36 @@ function renderVariationGroups() {
     return;
   }
 
-  wrap.innerHTML = visible.map(v => `
+  wrap.innerHTML = visible.map(v => {
+    const values = Array.isArray(v.group_values) ? v.group_values : [];
+    const prices = v.variant_prices && typeof v.variant_prices === 'object' ? v.variant_prices : {};
+    const priceEnabled = !!v._priceEnabled || Object.keys(prices).length > 0;
+    v._priceEnabled = priceEnabled;
+    v.variant_prices = prices;
+    return `
     <div class="variation-group-card" data-vg-id="${v.id}">
       <div class="vg-head">
         <input type="text" placeholder="Group name e.g. Color" value="${escapeHtml(v.group_name || '')}" data-vg-name="${v.id}">
         <button type="button" class="vg-remove" data-vg-remove="${v.id}" title="Remove group"><i class="fa-solid fa-trash"></i></button>
       </div>
-      <div class="vg-values-row">
+      <label class="checkbox-row vg-price-toggle">
+        <input type="checkbox" data-vg-price-toggle="${v.id}" ${priceEnabled ? 'checked' : ''}>
+        Add variant amount
+      </label>
+      <div class="vg-values-row ${priceEnabled ? 'has-price' : ''}">
         <input type="text" placeholder="Type a value and press Enter (e.g. Red)" data-vg-value-input="${v.id}">
+        <input type="number" step="0.01" min="0" placeholder="Variant price" data-vg-price-input="${v.id}" style="${priceEnabled ? '' : 'display:none;'}">
+        <button type="button" class="btn btn-outline btn-sm" data-vg-add-value="${v.id}"><i class="fa-solid fa-plus"></i> Add</button>
       </div>
       <div class="vg-chip-list" data-vg-chips="${v.id}">
-        ${(v.group_values || []).map(val => `<span class="vg-chip">${escapeHtml(val)} <button type="button" data-vg-remove-value="${v.id}" data-value="${escapeHtml(val)}">&times;</button></span>`).join('')}
+        ${values.map(val => {
+          const price = Number(prices[val] || 0);
+          return `<span class="vg-chip">${escapeHtml(val)}${price > 0 ? ` <em>${fmtPrice(price, __currencySymbol)}</em>` : ''} <button type="button" data-vg-remove-value="${v.id}" data-value="${escapeHtml(val)}">&times;</button></span>`;
+        }).join('')}
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   wrap.querySelectorAll('[data-vg-name]').forEach(input => {
     input.addEventListener('input', () => {
@@ -387,28 +403,65 @@ function renderVariationGroups() {
       renderVariationGroups();
     });
   });
+
+  wrap.querySelectorAll('[data-vg-price-toggle]').forEach(toggle => {
+    toggle.addEventListener('change', () => {
+      const v = __currentVariations.find(x => x.id === toggle.getAttribute('data-vg-price-toggle'));
+      if (!v) return;
+      v._priceEnabled = toggle.checked;
+      if (!toggle.checked) v.variant_prices = {};
+      renderVariationGroups();
+    });
+  });
+
+  function addVariationValue(id) {
+    const input = wrap.querySelector(`[data-vg-value-input="${id}"]`);
+    const priceInput = wrap.querySelector(`[data-vg-price-input="${id}"]`);
+    const val = input ? input.value.trim() : '';
+    if (!val) return;
+    const v = __currentVariations.find(x => x.id === id);
+    if (v) {
+      v.group_values = v.group_values || [];
+      v.variant_prices = v.variant_prices && typeof v.variant_prices === 'object' ? v.variant_prices : {};
+      if (!v.group_values.includes(val)) v.group_values.push(val);
+      if (v._priceEnabled && priceInput && priceInput.value !== '') {
+        const amount = Number(priceInput.value);
+        if (amount > 0) v.variant_prices[val] = amount;
+      }
+    }
+    if (input) input.value = '';
+    if (priceInput) priceInput.value = '';
+    renderVariationGroups();
+  }
+
   wrap.querySelectorAll('[data-vg-value-input]').forEach(input => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        const val = input.value.trim();
-        if (!val) return;
-        const v = __currentVariations.find(x => x.id === input.getAttribute('data-vg-value-input'));
-        if (v) {
-          v.group_values = v.group_values || [];
-          if (!v.group_values.includes(val)) v.group_values.push(val);
-        }
-        input.value = '';
-        renderVariationGroups();
+        addVariationValue(input.getAttribute('data-vg-value-input'));
       }
     });
+  });
+  wrap.querySelectorAll('[data-vg-price-input]').forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addVariationValue(input.getAttribute('data-vg-price-input'));
+      }
+    });
+  });
+  wrap.querySelectorAll('[data-vg-add-value]').forEach(btn => {
+    btn.addEventListener('click', () => addVariationValue(btn.getAttribute('data-vg-add-value')));
   });
   wrap.querySelectorAll('[data-vg-remove-value]').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-vg-remove-value');
       const val = btn.getAttribute('data-value');
       const v = __currentVariations.find(x => x.id === id);
-      if (v) v.group_values = (v.group_values || []).filter(x => x !== val);
+      if (v) {
+        v.group_values = (v.group_values || []).filter(x => x !== val);
+        if (v.variant_prices) delete v.variant_prices[val];
+      }
       renderVariationGroups();
     });
   });
@@ -419,6 +472,8 @@ function addVariationGroup() {
     id: genLocalId('vg'),
     group_name: '',
     group_values: [],
+    variant_prices: {},
+    _priceEnabled: false,
     sort_order: __currentVariations.length,
     _isNew: true
   });
@@ -475,7 +530,13 @@ function openProductModal(id) {
     const existingVariations = (__allVariationsCache || []).filter(v => v.product_id === id);
     __currentVariations = existingVariations
       .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
-      .map(v => ({ ...v, group_values: Array.isArray(v.group_values) ? v.group_values : [], _isNew: false }));
+      .map(v => ({
+        ...v,
+        group_values: Array.isArray(v.group_values) ? v.group_values : [],
+        variant_prices: v.variant_prices && typeof v.variant_prices === 'object' ? v.variant_prices : {},
+        _priceEnabled: !!(v.variant_prices && typeof v.variant_prices === 'object' && Object.keys(v.variant_prices).length),
+        _isNew: false
+      }));
   } else {
     document.getElementById('modalTitle').textContent = 'New Product';
     form.id.value = '';
@@ -561,7 +622,13 @@ async function syncProductVariations(productId) {
   const visible = __currentVariations.filter(v => !v._deleted && (v.group_name || '').trim());
   for (let i = 0; i < visible.length; i++) {
     const v = visible[i];
-    const payload = { product_id: productId, group_name: v.group_name.trim(), group_values: v.group_values || [], sort_order: i };
+    const payload = {
+      product_id: productId,
+      group_name: v.group_name.trim(),
+      group_values: v.group_values || [],
+      variant_prices: v._priceEnabled ? (v.variant_prices || {}) : {},
+      sort_order: i
+    };
     try {
       if (v._isNew) {
         await API.create('product_variations', { id: genLocalId('pv'), ...payload });

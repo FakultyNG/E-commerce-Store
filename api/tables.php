@@ -61,10 +61,10 @@ $schemas = [
         'json' => [],
     ],
     'product_variations' => [
-        'columns' => ['id','product_id','group_name','group_values','sort_order'],
+        'columns' => ['id','product_id','group_name','group_values','variant_prices','sort_order'],
         'number' => ['sort_order'],
         'bool' => [],
-        'json' => ['group_values'],
+        'json' => ['group_values','variant_prices'],
     ],
     'order_tracking_notes' => [
         'columns' => ['id','order_id','message'],

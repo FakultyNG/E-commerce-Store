@@ -6,6 +6,44 @@
 
 let __pdpMedia = [];
 let __pdpSelectedVariations = {};
+let __pdpCurrentProduct = null;
+let __pdpCurrentVariations = [];
+
+function getVariationValues(variation) {
+  return Array.isArray(variation.group_values) ? variation.group_values : [];
+}
+
+function getVariationPrices(variation) {
+  return variation.variant_prices && typeof variation.variant_prices === 'object' ? variation.variant_prices : {};
+}
+
+function selectedPdpPrice(product, variations) {
+  const basePrice = Number(product.price || 0);
+  for (const variation of variations) {
+    const selected = __pdpSelectedVariations[variation.group_name];
+    const prices = getVariationPrices(variation);
+    const price = Number(prices[selected] || 0);
+    if (selected && price > 0) return price;
+  }
+  return basePrice;
+}
+
+function updatePdpPriceDisplay() {
+  if (!__pdpCurrentProduct) return;
+  const price = selectedPdpPrice(__pdpCurrentProduct, __pdpCurrentVariations);
+  const symbol = window.__currencySymbol || '$';
+  const priceEl = document.getElementById('pdpPrice');
+  if (priceEl) priceEl.textContent = fmtPrice(price, symbol);
+
+  const depositEl = document.getElementById('pdpDepositText');
+  if (depositEl && __pdpCurrentProduct.product_type === 'pre_order') {
+    const pct = Number(__pdpCurrentProduct.deposit_percent || 0);
+    const depositAmt = pct > 0 ? price * pct / 100 : price;
+    depositEl.innerHTML = pct > 0
+      ? `Pay a <strong>${pct}% deposit</strong> (${fmtPrice(depositAmt, symbol)}) today to reserve. The remaining balance is due before shipment.`
+      : `Full payment is charged now. Item ships as soon as it's released.`;
+  }
+}
 
 function renderPdpGallery(media, name) {
   if (!media.length) {
@@ -65,14 +103,18 @@ function renderPdpVariations(variations) {
   if (!variations.length) return '';
   __pdpSelectedVariations = {};
   return variations.map(v => {
-    const values = Array.isArray(v.group_values) ? v.group_values : [];
+    const values = getVariationValues(v);
+    const prices = getVariationPrices(v);
     if (!values.length) return '';
     __pdpSelectedVariations[v.group_name] = values[0];
     return `
     <div class="pdp-variation-group" data-group="${escapeHtml(v.group_name)}">
       <label>${escapeHtml(v.group_name)}: <span class="selected-value-label">${escapeHtml(values[0])}</span></label>
       <div class="pdp-variation-options">
-        ${values.map((val, idx) => `<button type="button" class="pdp-variation-chip ${idx === 0 ? 'selected' : ''}" data-group="${escapeHtml(v.group_name)}" data-value="${escapeHtml(val)}">${escapeHtml(val)}</button>`).join('')}
+        ${values.map((val, idx) => {
+          const price = Number(prices[val] || 0);
+          return `<button type="button" class="pdp-variation-chip ${idx === 0 ? 'selected' : ''}" data-group="${escapeHtml(v.group_name)}" data-value="${escapeHtml(val)}">${escapeHtml(val)}${price > 0 ? ` <small>${fmtPrice(price, window.__currencySymbol || '$')}</small>` : ''}</button>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
@@ -88,15 +130,19 @@ function wirePdpVariationChips() {
       container.querySelectorAll('.pdp-variation-chip').forEach(c => c.classList.remove('selected'));
       chip.classList.add('selected');
       container.querySelector('.selected-value-label').textContent = value;
+      updatePdpPriceDisplay();
     });
   });
 }
 
 function renderPdp(p, symbol, media, variations) {
+  __pdpCurrentProduct = p;
+  __pdpCurrentVariations = variations;
   const isPreorder = p.product_type === 'pre_order';
   const outOfStock = !isPreorder && (p.stock_quantity || 0) <= 0;
   const onSale = p.compare_at_price && p.compare_at_price > p.price;
-  const depositAmt = isPreorder && p.deposit_percent > 0 ? (p.price * p.deposit_percent / 100) : p.price;
+  const activePrice = selectedPdpPrice(p, variations);
+  const depositAmt = isPreorder && p.deposit_percent > 0 ? (activePrice * p.deposit_percent / 100) : activePrice;
 
   document.getElementById('crumbName').textContent = p.name;
   document.title = `${p.name} — Amah Wigs`;
@@ -119,8 +165,8 @@ function renderPdp(p, symbol, media, variations) {
         <h4><i class="fa-solid fa-hourglass-half"></i> Pre-Order Details</h4>
         <p>
           ${p.deposit_percent > 0
-            ? `Pay a <strong>${p.deposit_percent}% deposit</strong> (${fmtPrice(depositAmt, symbol)}) today to reserve. The remaining balance is due before shipment.`
-            : `Full payment is charged now. Item ships as soon as it's released.`}
+            ? `<span id="pdpDepositText">Pay a <strong>${p.deposit_percent}% deposit</strong> (${fmtPrice(depositAmt, symbol)}) today to reserve. The remaining balance is due before shipment.</span>`
+            : `<span id="pdpDepositText">Full payment is charged now. Item ships as soon as it's released.</span>`}
           ${p.release_date ? `<br>Expected availability: <strong>${escapeHtml(p.release_date)}</strong>.` : ''}
         </p>
       </div>`;
@@ -143,7 +189,7 @@ function renderPdp(p, symbol, media, variations) {
         <h1 class="pdp-title">${escapeHtml(p.name)}</h1>
         <div class="pdp-sku">SKU: ${escapeHtml(p.sku || '—')} &nbsp;|&nbsp; Category: ${escapeHtml(p.category || '—')}</div>
         <div class="pdp-price-row">
-          <span class="pdp-price">${fmtPrice(p.price, symbol)}</span>
+          <span class="pdp-price" id="pdpPrice">${fmtPrice(activePrice, symbol)}</span>
           ${onSale ? `<span class="price-compare" style="font-size:18px;">${fmtPrice(p.compare_at_price, symbol)}</span>` : ''}
         </div>
         ${stockLine}
@@ -190,7 +236,7 @@ function renderPdp(p, symbol, media, variations) {
   if (addBtn) {
     addBtn.addEventListener('click', () => {
       const qty = Math.max(1, Number(document.getElementById('qtyInput').value) || 1);
-      Cart.add(p, qty, variations.length ? { ...__pdpSelectedVariations } : null);
+      Cart.add({ ...p, price: selectedPdpPrice(p, variations) }, qty, variations.length ? { ...__pdpSelectedVariations } : null);
       showToast(`${p.name} added to cart`);
     });
   }
