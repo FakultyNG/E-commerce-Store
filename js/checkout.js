@@ -4,14 +4,10 @@
    Payment methods offered (each gated by admin Settings toggles):
    - Credit/Debit Card    -> Paystack Inline, channels: ['card']
    - Bank Transfer        -> Paystack Inline, channels: ['bank_transfer','bank']
-   - Opay                 -> server-side Paystack transaction initialize,
-     restricted to Paystack's bank/direct-debit-style checkout redirect.
    - Offline Payment      -> admin-configured bank details shown to the
      customer; customer uploads a receipt image (compressed client-side)
      which is stored with the order for manual admin confirmation.
 
-   NOTE: Opay uses the cPanel PHP backend so the Paystack secret key is not
-   exposed in browser JavaScript.
    ========================================================================== */
 
 let __appliedCoupon = null; // { code, discount_type, discount_value, id }
@@ -37,7 +33,6 @@ function paymentMethodOptions(settings) {
   if (settings.paystack_enabled && settings.paystack_public_key) {
     opts.push({ key: 'card', label: 'Credit / Debit Card', sub: 'Pay securely with your card via Paystack', icon: 'fa-credit-card' });
     opts.push({ key: 'bank_transfer', label: 'Bank Transfer', sub: 'Pay by transfer from your bank app via Paystack', icon: 'fa-building-columns' });
-    opts.push({ key: 'opay', label: 'Opay', sub: 'Open the Paystack direct debit payment flow', icon: 'fa-wallet' });
   }
   if (settings.offline_payment_enabled) {
     opts.push({ key: 'offline', label: 'Offline Payment', sub: 'Manual bank transfer — upload your receipt', icon: 'fa-money-bill-transfer' });
@@ -194,17 +189,6 @@ function renderPaymentMethodPanel(method, settings) {
         <p style="margin:0;font-size:13px;color:var(--gray-700);">
           <i class="fa-solid fa-shield-halved" style="color:var(--success);"></i>
           You'll be securely redirected to Paystack to complete your ${labelMap[method]} payment when you click "Place Order" below.
-        </p>
-      </div>`;
-    return;
-  }
-
-  if (method === 'opay') {
-    panel.innerHTML = `
-      <div class="payment-method-panel">
-        <p style="margin:0;font-size:13px;color:var(--gray-700);">
-          <i class="fa-solid fa-shield-halved" style="color:var(--success);"></i>
-          You'll be sent directly to Paystack's direct debit payment page for this order.
         </p>
       </div>`;
     return;
@@ -403,45 +387,6 @@ async function handlePlaceOrder(e, settings, dueNow, subtotal, discount) {
   const method = __selectedPaymentMethod;
 
   const hasPaystackMethods = settings.paystack_enabled && settings.paystack_public_key;
-
-  if (method === 'opay' && hasPaystackMethods) {
-    const fd = new FormData(form);
-    const email = fd.get('customer_email');
-    if (!email) { showToast('Please enter your email.', 'fa-triangle-exclamation'); return; }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening Opay payment...';
-
-    const orderPayload = buildOrderPayload(fd, dueNow, subtotal, discount, 'opay', {
-      payment_status: Cart.orderType() === 'in_stock' ? 'paid' : 'deposit_paid',
-      fulfillment_status: Cart.orderType() === 'pre_order' ? 'awaiting_stock' : 'pending',
-      notes: __appliedCoupon ? `Coupon applied: ${__appliedCoupon.code}` : ''
-    });
-
-    try {
-      const callbackUrl = new URL('order-success.html', window.location.href);
-      callbackUrl.searchParams.set('paystack_pending', '1');
-      callbackUrl.searchParams.set('reference', orderPayload.order_number);
-
-      const init = await postPaystackAction('initialize-opay-direct-debit', {
-        email,
-        amount: Math.max(100, Math.round(dueNow * 100)),
-        reference: orderPayload.order_number,
-        callback_url: callbackUrl.toString(),
-        customer_name: orderPayload.customer_name
-      });
-
-      orderPayload.paystack_reference = init.reference || orderPayload.order_number;
-      sessionStorage.setItem('pendingPaystackOrderPayload', JSON.stringify(orderPayload));
-      window.location.href = init.authorization_url;
-    } catch (err) {
-      console.error(err);
-      showToast(err.message || 'Could not open Opay payment. Please try again.', 'fa-triangle-exclamation');
-      btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-lock"></i> Place Order — ${fmtPrice(dueNow, window.__currencySymbol)} due now`;
-    }
-    return;
-  }
 
   if ((method === 'card' || method === 'bank_transfer') && hasPaystackMethods) {
     if (typeof PaystackPop === 'undefined') {

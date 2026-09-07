@@ -30,7 +30,7 @@ function opTypePill(type) {
   return `<span class="pill ${map[type] || 'pill-gray'}">${label[type] || type}</span>`;
 }
 function paymentMethodLabel(method) {
-  const map = { card: 'Credit/Debit Card', bank_transfer: 'Bank Transfer', opay: 'Opay', offline: 'Offline Payment' };
+  const map = { card: 'Credit/Debit Card', bank_transfer: 'Bank Transfer', offline: 'Offline Payment' };
   return map[method] || '—';
 }
 
