@@ -14,6 +14,23 @@ let __appliedCoupon = null; // { code, discount_type, discount_value, id }
 let __storeSettings = null;
 let __selectedPaymentMethod = null;
 let __offlineReceiptDataUrl = '';
+let __selectedDelivery = { option: 'pickup', weight_band: '1_2', doorstep: false };
+
+const DELIVERY_CONFIG_DEFAULTS = {
+  doorstep_fee: 6000,
+  zones: [
+    { key: 'pickup', label: 'Pickup', fees: { '1_2': 0, '2_4': 0, '4_plus': 0 } },
+    { key: 'lagos_south_east', label: 'Lagos and South East states', fees: { '1_2': 6000, '2_4': 9000, '4_plus': 13000 } },
+    { key: 'abuja', label: 'Abuja', fees: { '1_2': 10000, '2_4': 14000, '4_plus': 13000 } },
+    { key: 'other_northern', label: 'Other Northern States', fees: { '1_2': 9000, '2_4': 15000, '4_plus': 19000 } }
+  ]
+};
+
+const DELIVERY_WEIGHT_LABELS = {
+  '1_2': '1-2kg',
+  '2_4': '2kg - 4kg',
+  '4_plus': '4kg and above'
+};
 
 function formatVariationInline(variation) {
   if (!variation) return '';
@@ -26,6 +43,110 @@ function computeDiscount(subtotal) {
     return subtotal * (__appliedCoupon.discount_value / 100);
   }
   return Math.min(subtotal, __appliedCoupon.discount_value);
+}
+
+function getDeliveryConfig(settings) {
+  let config = settings.delivery_config || {};
+  if (typeof config === 'string') {
+    try { config = JSON.parse(config); } catch (e) { config = {}; }
+  }
+  const zoneMap = {};
+  DELIVERY_CONFIG_DEFAULTS.zones.forEach(zone => { zoneMap[zone.key] = { ...zone, fees: { ...zone.fees } }; });
+  (Array.isArray(config.zones) ? config.zones : []).forEach(zone => {
+    if (!zone || !zone.key) return;
+    zoneMap[zone.key] = {
+      ...zoneMap[zone.key],
+      ...zone,
+      fees: { ...(zoneMap[zone.key] ? zoneMap[zone.key].fees : {}), ...(zone.fees || {}) }
+    };
+  });
+  return {
+    doorstep_fee: Number(config.doorstep_fee ?? DELIVERY_CONFIG_DEFAULTS.doorstep_fee) || 0,
+    zones: DELIVERY_CONFIG_DEFAULTS.zones.map(zone => zoneMap[zone.key])
+  };
+}
+
+function currentDeliverySelection(config) {
+  const option = __selectedDelivery.option || 'pickup';
+  const zone = config.zones.find(z => z.key === option) || config.zones[0];
+  const weightBand = option === 'pickup' ? '1_2' : (__selectedDelivery.weight_band || '1_2');
+  const baseFee = Number((zone.fees || {})[weightBand] || 0);
+  const doorstep = option !== 'pickup' && !!__selectedDelivery.doorstep;
+  const doorstepFee = doorstep ? Number(config.doorstep_fee || 0) : 0;
+  return {
+    option,
+    option_label: zone.label,
+    weight_band: weightBand,
+    weight_label: DELIVERY_WEIGHT_LABELS[weightBand] || weightBand,
+    doorstep,
+    doorstep_fee: doorstepFee,
+    delivery_cost: baseFee + doorstepFee
+  };
+}
+
+function calculateCheckoutTotals(settings) {
+  const subtotal = Cart.subtotal();
+  const dueNowBase = Cart.dueNow();
+  const discount = computeDiscount(subtotal);
+  const discountRatio = subtotal > 0 ? discount / subtotal : 0;
+  const itemDueNow = Math.max(0, dueNowBase - dueNowBase * discountRatio);
+  const delivery = currentDeliverySelection(getDeliveryConfig(settings));
+  const dueNow = itemDueNow + delivery.delivery_cost;
+  const laterDue = Math.max(0, (subtotal - discount) - itemDueNow);
+  return { subtotal, dueNowBase, discount, itemDueNow, delivery, dueNow, laterDue };
+}
+
+function renderDeliveryOptions(settings, symbol) {
+  const config = getDeliveryConfig(settings);
+  const delivery = currentDeliverySelection(config);
+  return `
+    <div class="delivery-options">
+      ${config.zones.map(zone => {
+        const fee1 = Number((zone.fees || {})['1_2'] || 0);
+        const fee2 = Number((zone.fees || {})['2_4'] || 0);
+        const fee3 = Number((zone.fees || {})['4_plus'] || 0);
+        const priceText = zone.key === 'pickup'
+          ? 'Free'
+          : `${fmtPrice(fee1, symbol)} / ${fmtPrice(fee2, symbol)} / ${fmtPrice(fee3, symbol)}`;
+        return `
+          <label class="delivery-option ${delivery.option === zone.key ? 'selected' : ''}">
+            <input type="radio" name="delivery_option" value="${escapeHtml(zone.key)}" ${delivery.option === zone.key ? 'checked' : ''}>
+            <span>
+              <strong>${escapeHtml(zone.label)}</strong>
+              <small>${priceText}</small>
+            </span>
+          </label>`;
+      }).join('')}
+      <div class="form-row" id="deliveryWeightRow" style="${delivery.option === 'pickup' ? 'display:none;' : ''}">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Package Weight</label>
+          <select name="delivery_weight_band" id="deliveryWeightBand">
+            ${Object.entries(DELIVERY_WEIGHT_LABELS).map(([key, label]) => `<option value="${key}" ${delivery.weight_band === key ? 'selected' : ''}>${label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="checkbox-row" style="margin-top:29px;">
+            <input type="checkbox" name="delivery_doorstep" id="deliveryDoorstep" ${delivery.doorstep ? 'checked' : ''}>
+            Doorstep delivery (+${fmtPrice(config.doorstep_fee, symbol)})
+          </label>
+        </div>
+      </div>
+    </div>`;
+}
+
+function updateCheckoutTotals(settings, symbol) {
+  const totals = calculateCheckoutTotals(settings);
+  const deliverySummary = document.getElementById('deliverySummaryRows');
+  if (deliverySummary) {
+    deliverySummary.innerHTML = `
+      <div class="summary-row"><span>Delivery</span><span>${fmtPrice(totals.delivery.delivery_cost, symbol)}</span></div>
+      <div class="summary-row" style="font-size:12.5px;color:var(--gray-500);margin-top:-6px;"><span>${escapeHtml(totals.delivery.option_label)}${totals.delivery.option !== 'pickup' ? ` · ${escapeHtml(totals.delivery.weight_label)}${totals.delivery.doorstep ? ' · Doorstep' : ''}` : ''}</span><span></span></div>
+    `;
+  }
+  const totalDueEl = document.getElementById('totalDueNow');
+  if (totalDueEl) totalDueEl.textContent = fmtPrice(totals.dueNow, symbol);
+  const placeBtn = document.getElementById('placeOrderBtn');
+  if (placeBtn) placeBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Place Order — ${fmtPrice(totals.dueNow, symbol)} due now`;
 }
 
 function paymentMethodOptions(settings) {
@@ -55,13 +176,11 @@ function renderCheckout(symbol, settings) {
     return;
   }
 
-  const subtotal = Cart.subtotal();
-  const dueNowBase = Cart.dueNow();
-  const discount = computeDiscount(subtotal);
-  // Discount applies proportionally to the "due now" amount (deposit or full).
-  const discountRatio = subtotal > 0 ? discount / subtotal : 0;
-  const dueNow = Math.max(0, dueNowBase - dueNowBase * discountRatio);
-  const laterDue = (subtotal - discount) - dueNow;
+  const totals = calculateCheckoutTotals(settings);
+  const subtotal = totals.subtotal;
+  const discount = totals.discount;
+  const dueNow = totals.dueNow;
+  const laterDue = totals.laterDue;
   const hasPreorder = Cart.hasPreorder();
 
   const lineItemsHtml = items.map(i => {
@@ -120,6 +239,11 @@ function renderCheckout(symbol, settings) {
           </div>
 
           <div class="checkout-section">
+            <h3><i class="fa-solid fa-truck"></i> Delivery Option</h3>
+            ${renderDeliveryOptions(settings, symbol)}
+          </div>
+
+          <div class="checkout-section">
             <h3><i class="fa-solid fa-credit-card"></i> Payment Method</h3>
             <div class="payment-method-list" id="paymentMethodList">${methodsHtml}</div>
             <div id="paymentMethodPanel"></div>
@@ -147,16 +271,50 @@ function renderCheckout(symbol, settings) {
         <div class="summary-row"><span>Subtotal</span><span>${fmtPrice(subtotal, symbol)}</span></div>
         ${discount > 0 ? `<div class="summary-row" style="color:var(--success);"><span>Discount</span><span>-${fmtPrice(discount, symbol)}</span></div>` : ''}
         ${hasPreorder ? `
-        <div class="summary-row"><span>Deposit / due now</span><span>${fmtPrice(dueNow, symbol)}</span></div>
+        <div class="summary-row"><span>Deposit / due now</span><span>${fmtPrice(totals.itemDueNow, symbol)}</span></div>
         <div class="summary-row"><span>Balance due before shipment</span><span>${fmtPrice(laterDue, symbol)}</span></div>
         ` : ''}
-        <div class="summary-row total"><span>Total due now</span><span>${fmtPrice(dueNow, symbol)}</span></div>
+        <div id="deliverySummaryRows"></div>
+        <div class="summary-row total"><span>Total due now</span><span id="totalDueNow">${fmtPrice(dueNow, symbol)}</span></div>
       </div>
     </div>
   `;
 
-  document.getElementById('checkoutForm').addEventListener('submit', (e) => handlePlaceOrder(e, settings, dueNow, subtotal, discount));
+  document.getElementById('checkoutForm').addEventListener('submit', (e) => handlePlaceOrder(e, settings));
   document.getElementById('applyCouponBtn').addEventListener('click', () => handleCouponToggle(symbol, settings));
+
+  document.querySelectorAll('input[name="delivery_option"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      __selectedDelivery.option = radio.value;
+      if (radio.value === 'pickup') {
+        __selectedDelivery.weight_band = '1_2';
+        __selectedDelivery.doorstep = false;
+      }
+      document.querySelectorAll('.delivery-option').forEach(el => el.classList.remove('selected'));
+      radio.closest('.delivery-option').classList.add('selected');
+      const weightRow = document.getElementById('deliveryWeightRow');
+      if (weightRow) weightRow.style.display = radio.value === 'pickup' ? 'none' : '';
+      const weightSelect = document.getElementById('deliveryWeightBand');
+      if (weightSelect) weightSelect.value = __selectedDelivery.weight_band;
+      const doorstepInput = document.getElementById('deliveryDoorstep');
+      if (doorstepInput) doorstepInput.checked = __selectedDelivery.doorstep;
+      updateCheckoutTotals(settings, symbol);
+    });
+  });
+  const weightSelect = document.getElementById('deliveryWeightBand');
+  if (weightSelect) {
+    weightSelect.addEventListener('change', () => {
+      __selectedDelivery.weight_band = weightSelect.value;
+      updateCheckoutTotals(settings, symbol);
+    });
+  }
+  const doorstepInput = document.getElementById('deliveryDoorstep');
+  if (doorstepInput) {
+    doorstepInput.addEventListener('change', () => {
+      __selectedDelivery.doorstep = doorstepInput.checked;
+      updateCheckoutTotals(settings, symbol);
+    });
+  }
 
   // Wire payment method selection
   document.querySelectorAll('#paymentMethodList input[name="payment_method"]').forEach(radio => {
@@ -175,6 +333,7 @@ function renderCheckout(symbol, settings) {
     firstRadio.closest('.payment-method-option').classList.add('selected');
     renderPaymentMethodPanel(__selectedPaymentMethod, settings);
   }
+  updateCheckoutTotals(settings, symbol);
 }
 
 function renderPaymentMethodPanel(method, settings) {
@@ -309,13 +468,13 @@ async function handleCouponToggle(symbol, settings) {
 }
 
 // Builds the order payload common to every payment method.
-function buildOrderPayload(formData, dueNow, subtotal, discount, paymentMethod, extra) {
+function buildOrderPayload(formData, totals, paymentMethod, extra) {
   const items = Cart.getItems();
   const orderType = Cart.orderType();
   const shippingAddress = [
     formData.get('address_line'), formData.get('city'), formData.get('state'), formData.get('postal_code'), formData.get('country')
   ].filter(Boolean).join(', ');
-  const couponNote = __appliedCoupon ? `Coupon applied: ${__appliedCoupon.code} (-${fmtPrice(discount, window.__currencySymbol)})` : '';
+  const couponNote = __appliedCoupon ? `Coupon applied: ${__appliedCoupon.code} (-${fmtPrice(totals.discount, window.__currencySymbol)})` : '';
 
   return {
     id: 'ord_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
@@ -327,8 +486,12 @@ function buildOrderPayload(formData, dueNow, subtotal, discount, paymentMethod, 
     items: JSON.stringify(items.map(i => ({
       id: i.id, name: i.name, price: i.price, qty: i.qty, type: i.product_type, image: i.image_url, variation: i.variation || null
     }))),
-    subtotal: Number(subtotal.toFixed(2)),
-    total: Number(dueNow.toFixed(2)),
+    subtotal: Number(totals.subtotal.toFixed(2)),
+    delivery_option: totals.delivery.option_label,
+    delivery_weight_band: totals.delivery.option === 'pickup' ? '' : totals.delivery.weight_label,
+    delivery_doorstep: totals.delivery.doorstep,
+    delivery_cost: Number(totals.delivery.delivery_cost.toFixed(2)),
+    total: Number(totals.dueNow.toFixed(2)),
     order_type: orderType,
     payment_method: paymentMethod,
     ...extra
@@ -369,22 +532,13 @@ function paystackChannelsFor(method) {
   return undefined;
 }
 
-async function postPaystackAction(action, payload) {
-  const res = await fetch(`${__API_BASE}api/paystack.php?action=${encodeURIComponent(action)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || !data.status) throw new Error(data.message || 'Paystack request failed');
-  return data;
-}
-
-async function handlePlaceOrder(e, settings, dueNow, subtotal, discount) {
+async function handlePlaceOrder(e, settings) {
   e.preventDefault();
   const btn = document.getElementById('placeOrderBtn');
   const form = e.target;
   const method = __selectedPaymentMethod;
+  const totals = calculateCheckoutTotals(settings);
+  const dueNow = totals.dueNow;
 
   const hasPaystackMethods = settings.paystack_enabled && settings.paystack_public_key;
 
@@ -400,7 +554,7 @@ async function handlePlaceOrder(e, settings, dueNow, subtotal, discount) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening secure payment...';
 
-    const orderPayload = buildOrderPayload(fd, dueNow, subtotal, discount, method, {
+    const orderPayload = buildOrderPayload(fd, totals, method, {
       payment_status: Cart.orderType() === 'in_stock' ? 'paid' : 'deposit_paid',
       fulfillment_status: Cart.orderType() === 'pre_order' ? 'awaiting_stock' : 'pending',
       notes: __appliedCoupon ? `Coupon applied: ${__appliedCoupon.code}` : ''
@@ -451,7 +605,7 @@ async function handlePlaceOrder(e, settings, dueNow, subtotal, discount) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Placing order...';
     const fd = new FormData(form);
-    const orderPayload = buildOrderPayload(fd, dueNow, subtotal, discount, 'offline', {
+    const orderPayload = buildOrderPayload(fd, totals, 'offline', {
       payment_status: 'pending',
       fulfillment_status: 'pending',
       notes: __appliedCoupon ? `Coupon applied: ${__appliedCoupon.code}` : '',
@@ -472,7 +626,7 @@ async function handlePlaceOrder(e, settings, dueNow, subtotal, discount) {
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Placing order...';
   const fd = new FormData(form);
-  const orderPayload = buildOrderPayload(fd, dueNow, subtotal, discount, method || '', {
+  const orderPayload = buildOrderPayload(fd, totals, method || '', {
     payment_status: 'pending',
     fulfillment_status: 'pending',
     notes: __appliedCoupon ? `Coupon applied: ${__appliedCoupon.code}` : ''

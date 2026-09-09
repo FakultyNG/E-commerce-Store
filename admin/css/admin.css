@@ -224,6 +224,16 @@ table.admin-table tr:hover td { background: var(--gray-50); }
 .vg-chip button { background: none; border: none; color: var(--gray-400); font-size: 12px; padding: 0; }
 .vg-chip button:hover { color: var(--danger); }
 
+/* ---------- Delivery fee editor ---------- */
+.delivery-fee-editor { border: 1px solid var(--gray-200); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 16px; }
+.delivery-fee-head,
+.delivery-fee-row { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 10px; align-items: center; padding: 10px 12px; }
+.delivery-fee-head { background: var(--gray-50); color: var(--gray-500); font-size: 11px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--gray-200); }
+.delivery-fee-row { border-bottom: 1px solid var(--gray-100); }
+.delivery-fee-row:last-child { border-bottom: none; }
+.delivery-fee-row label { font-size: 13px; font-weight: 700; color: var(--gray-700); }
+.delivery-fee-row input { min-width: 0; padding: 9px 10px; border: 1.5px solid var(--gray-200); border-radius: 8px; }
+
 /* ---------- Color swatches (theme/content admin) ---------- */
 .color-field-row { display: flex; align-items: center; gap: 10px; }
 .color-field-row input[type="color"] { width: 44px; height: 38px; padding: 2px; border: 1.5px solid var(--gray-200); border-radius: 8px; cursor: pointer; }
@@ -276,6 +286,8 @@ table.admin-table tr:hover td { background: var(--gray-50); }
   .admin-sidebar.open { left: 0; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .form-row { grid-template-columns: 1fr; }
+  .delivery-fee-head { display: none; }
+  .delivery-fee-row { grid-template-columns: 1fr; gap: 8px; }
   .admin-content { padding: 18px; }
   .admin-topbar { padding: 14px 18px; }
 }

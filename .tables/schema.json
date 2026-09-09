@@ -131,6 +131,26 @@
         "description": "Order subtotal"
       },
       {
+        "name": "delivery_option",
+        "type": "text",
+        "description": "Selected delivery location/option label"
+      },
+      {
+        "name": "delivery_weight_band",
+        "type": "text",
+        "description": "Selected delivery weight band label"
+      },
+      {
+        "name": "delivery_doorstep",
+        "type": "bool",
+        "description": "Whether doorstep delivery surcharge was selected"
+      },
+      {
+        "name": "delivery_cost",
+        "type": "number",
+        "description": "Delivery fee added to the order total"
+      },
+      {
         "name": "total",
         "type": "number",
         "description": "Order total amount due now (deposit or full)"
@@ -181,14 +201,13 @@
         "options": [
           "card",
           "bank_transfer",
-          "opay",
           "offline"
         ]
       },
       {
         "name": "paystack_reference",
         "type": "text",
-        "description": "Paystack transaction reference, for card/bank_transfer/opay payments verified via Paystack"
+        "description": "Paystack transaction reference, for card/bank_transfer payments verified via Paystack"
       },
       {
         "name": "offline_receipt_url",
@@ -238,7 +257,7 @@
       {
         "name": "paystack_enabled",
         "type": "bool",
-        "description": "Whether Paystack-powered payment methods (Card, Bank Transfer, Opay) are offered at checkout"
+        "description": "Whether Paystack-powered payment methods (Card, Bank Transfer) are offered at checkout"
       },
       {
         "name": "paystack_currency",
@@ -269,6 +288,11 @@
         "name": "offline_instructions",
         "type": "rich_text",
         "description": "Extra instructions shown to customers for manual/offline bank transfer (e.g. reference format)"
+      },
+      {
+        "name": "delivery_config",
+        "type": "rich_text",
+        "description": "JSON delivery fee config used by checkout and edited from admin Settings"
       }
     ]
   },

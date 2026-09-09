@@ -41,6 +41,10 @@ CREATE TABLE `orders` (
   `shipping_address` mediumtext,
   `items` mediumtext,
   `subtotal` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `delivery_option` varchar(160) DEFAULT '',
+  `delivery_weight_band` varchar(80) DEFAULT '',
+  `delivery_doorstep` tinyint(1) NOT NULL DEFAULT 0,
+  `delivery_cost` decimal(12,2) NOT NULL DEFAULT 0.00,
   `total` decimal(12,2) NOT NULL DEFAULT 0.00,
   `order_type` varchar(30) DEFAULT 'in_stock',
   `payment_status` varchar(40) DEFAULT 'pending',
@@ -68,6 +72,7 @@ CREATE TABLE `settings` (
   `offline_account_name` varchar(160) DEFAULT 'WigsbyAmah',
   `offline_account_number` varchar(80) DEFAULT '0000000000',
   `offline_instructions` mediumtext,
+  `delivery_config` mediumtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -181,11 +186,11 @@ CREATE TABLE `size_test_rt` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `settings` (`id`, `store_name`, `admin_username`, `admin_password`, `currency_symbol`, `paystack_enabled`, `paystack_currency`, `offline_payment_enabled`, `offline_bank_name`, `offline_account_name`, `offline_account_number`, `offline_instructions`) VALUES
-('store_settings', 'WigsbyAmah', 'admin', 'admin123', 'NGN ', 0, 'NGN', 1, 'Demo Bank', 'WigsbyAmah', '0000000000', 'Use your order number as the transfer reference, then upload your receipt at checkout.');
+INSERT INTO `settings` (`id`, `store_name`, `admin_username`, `admin_password`, `currency_symbol`, `paystack_enabled`, `paystack_currency`, `offline_payment_enabled`, `offline_bank_name`, `offline_account_name`, `offline_account_number`, `offline_instructions`, `delivery_config`) VALUES
+('store_settings', 'WigsbyAmah', 'admin', 'admin123', 'NGN ', 0, 'NGN', 1, 'Demo Bank', 'WigsbyAmah', '0000000000', 'Use your order number as the transfer reference, then upload your receipt at checkout.', '{"doorstep_fee":6000,"zones":[{"key":"pickup","label":"Pickup","fees":{"1_2":0,"2_4":0,"4_plus":0}},{"key":"lagos_south_east","label":"Lagos and South East states","fees":{"1_2":6000,"2_4":9000,"4_plus":13000}},{"key":"abuja","label":"Abuja","fees":{"1_2":10000,"2_4":14000,"4_plus":13000}},{"key":"other_northern","label":"Other Northern States","fees":{"1_2":9000,"2_4":15000,"4_plus":19000}}]}');
 
 INSERT INTO `site_content` (`id`, `announcement_text`, `hero_badge_text`, `hero_heading`, `hero_subheading`, `hero_image_url`, `hero_cta_primary_text`, `hero_cta_primary_link`, `hero_cta_secondary_text`, `hero_cta_secondary_link`, `featured_section_heading`, `preorder_section_heading`, `preorder_section_subtext`, `categories_section_heading`, `footer_about_text`, `contact_email`, `contact_phone`, `whatsapp_number`, `free_shipping_threshold`) VALUES
-('site_content', 'Free delivery on orders over NGN 150000 | New wig drops every week', 'Ready-to-wear hair essentials', 'WigsbyAmah', 'Shop lace wigs, bundles, care products, and styling tools for polished everyday installs.', 'https://placehold.co/1200x850/e9d5c0/111111?text=WigsbyAmah', 'Shop Hair', 'shop.html', 'View Pre-Orders', 'shop.html?type=pre_order', 'Popular Hair Products', 'Pre-order Wigs', 'Reserve selected premium units with a deposit before they arrive.', 'Shop Categories', 'Quality wigs, bundles, hair care, and styling tools for everyday beauty.', 'hello@example.com', '+234 800 000 0000', '2348000000000', 150000.00);
+('site_content', 'Free delivery on orders over NGN 150000 | New wig drops every week', 'Ready-to-wear hair essentials', 'WigsbyAmah', 'Shop lace wigs, bundles, care products, and styling tools for polished everyday installs.', 'https://placehold.co/1200x850/e9d5c0/111111?text=WigsbyAmah', 'Shop Hair', 'shop.html', 'View Pre-Orders', 'shop.html?type=pre_order', 'Popular Hair Products', 'Pre-order Wigs', 'Reserve selected premium units with a deposit before they arrive.', 'Shop Categories', 'Quality wigs, bundles, hair care, and styling tools for everyday beauty.', 'hello@example.com', '+2349013400051', '2349013400051', 150000.00);
 
 INSERT INTO `categories` (`id`, `name`, `icon`, `image_url`, `sort_order`, `status`) VALUES
 ('cat_lace_front', 'Lace Front Wigs', 'fa-user', 'https://placehold.co/600x600/f3e8ff/111111?text=Lace+Front', 1, 'active'),

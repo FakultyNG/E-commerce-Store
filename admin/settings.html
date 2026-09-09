@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="admin-content" style="max-width:640px;">
+    <div class="admin-content" style="max-width:760px;">
       <div class="panel">
         <div class="panel-head"><h3><i class="fa-solid fa-store"></i> Store Information</h3></div>
         <form id="storeForm">
@@ -86,6 +86,52 @@
             <textarea name="offline_instructions" rows="2" placeholder="e.g. Use your order number as the transfer reference."></textarea>
           </div>
           <button type="submit" class="btn btn-primary" id="saveOfflineBtn"><i class="fa-solid fa-check"></i> Save Offline Payment Settings</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3><i class="fa-solid fa-truck-fast"></i> Delivery Fees</h3></div>
+        <p style="font-size:13px;color:var(--gray-500);margin-top:-8px;">These delivery options appear at checkout and are added to the customer's final amount before payment.</p>
+        <form id="deliveryForm">
+          <div class="form-group">
+            <label>Doorstep Delivery Extra Fee</label>
+            <input type="number" name="doorstep_fee" min="0" step="1">
+          </div>
+
+          <div class="delivery-fee-editor">
+            <div class="delivery-fee-head">
+              <span>Location</span>
+              <span>1-2kg</span>
+              <span>2kg - 4kg</span>
+              <span>4kg and above</span>
+            </div>
+            <div class="delivery-fee-row">
+              <label>Pickup</label>
+              <input type="number" name="pickup_1_2" min="0" step="1">
+              <input type="number" name="pickup_2_4" min="0" step="1">
+              <input type="number" name="pickup_4_plus" min="0" step="1">
+            </div>
+            <div class="delivery-fee-row">
+              <label>Lagos and South East states</label>
+              <input type="number" name="lagos_south_east_1_2" min="0" step="1">
+              <input type="number" name="lagos_south_east_2_4" min="0" step="1">
+              <input type="number" name="lagos_south_east_4_plus" min="0" step="1">
+            </div>
+            <div class="delivery-fee-row">
+              <label>Abuja</label>
+              <input type="number" name="abuja_1_2" min="0" step="1">
+              <input type="number" name="abuja_2_4" min="0" step="1">
+              <input type="number" name="abuja_4_plus" min="0" step="1">
+            </div>
+            <div class="delivery-fee-row">
+              <label>Other Northern States</label>
+              <input type="number" name="other_northern_1_2" min="0" step="1">
+              <input type="number" name="other_northern_2_4" min="0" step="1">
+              <input type="number" name="other_northern_4_plus" min="0" step="1">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="saveDeliveryBtn"><i class="fa-solid fa-check"></i> Save Delivery Fees</button>
         </form>
       </div>
 

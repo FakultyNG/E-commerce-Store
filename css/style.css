@@ -587,6 +587,18 @@ ul { list-style: none; margin: 0; padding: 0; }
 .receipt-upload-box { border: 1.5px dashed var(--gray-300); border-radius: 8px; padding: 16px; text-align: center; background: #fff; }
 .receipt-preview { max-width: 160px; max-height: 160px; border-radius: 8px; display: block; margin: 10px auto 0; object-fit: cover; }
 
+/* ---------- Checkout delivery options ---------- */
+.delivery-options { display: flex; flex-direction: column; gap: 10px; }
+.delivery-option {
+  display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  padding: 14px 16px; cursor: pointer; transition: all 0.15s; background: #fff;
+}
+.delivery-option:hover { border-color: var(--gray-300); background: var(--gray-50); }
+.delivery-option.selected { border-color: var(--primary); background: var(--primary-light, #eef2ff); box-shadow: 0 0 0 1px var(--primary); }
+.delivery-option input[type="radio"] { width: 18px; height: 18px; flex-shrink: 0; }
+.delivery-option strong { display: block; font-size: 14px; }
+.delivery-option small { display: block; font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
 /* ---------- Order success / tracking ---------- */
 .success-box { max-width: 640px; margin: 60px auto; text-align: center; padding: 0 20px; }
 .success-icon { width: 88px; height: 88px; border-radius: 50%; background: var(--success-light); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 24px; }

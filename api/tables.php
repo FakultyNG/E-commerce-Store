@@ -19,16 +19,16 @@ $schemas = [
         'json' => ['gallery'],
     ],
     'orders' => [
-        'columns' => ['id','order_number','customer_name','customer_email','customer_phone','shipping_address','items','subtotal','total','order_type','payment_status','fulfillment_status','notes','payment_method','paystack_reference','offline_receipt_url'],
-        'number' => ['subtotal','total'],
-        'bool' => [],
+        'columns' => ['id','order_number','customer_name','customer_email','customer_phone','shipping_address','items','subtotal','delivery_option','delivery_weight_band','delivery_doorstep','delivery_cost','total','order_type','payment_status','fulfillment_status','notes','payment_method','paystack_reference','offline_receipt_url'],
+        'number' => ['subtotal','delivery_cost','total'],
+        'bool' => ['delivery_doorstep'],
         'json' => [],
     ],
     'settings' => [
-        'columns' => ['id','store_name','admin_username','admin_password','currency_symbol','paystack_public_key','paystack_secret_key','paystack_enabled','paystack_currency','offline_payment_enabled','offline_bank_name','offline_account_name','offline_account_number','offline_instructions'],
+        'columns' => ['id','store_name','admin_username','admin_password','currency_symbol','paystack_public_key','paystack_secret_key','paystack_enabled','paystack_currency','offline_payment_enabled','offline_bank_name','offline_account_name','offline_account_number','offline_instructions','delivery_config'],
         'number' => [],
         'bool' => ['paystack_enabled','offline_payment_enabled'],
-        'json' => [],
+        'json' => ['delivery_config'],
     ],
     'categories' => [
         'columns' => ['id','name','icon','image_url','sort_order','status'],

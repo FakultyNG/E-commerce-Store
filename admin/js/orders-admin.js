@@ -110,7 +110,15 @@ function openOrderModal(id) {
     </div>
 
     <div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px;"><span>Subtotal</span><span>${fmtPrice(o.subtotal, __ordersCurrencySymbol)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px;"><span>Delivery</span><span>${fmtPrice(o.delivery_cost || 0, __ordersCurrencySymbol)}</span></div>
     <div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px;margin-bottom:20px;"><span>Total Charged</span><span>${fmtPrice(o.total, __ordersCurrencySymbol)}</span></div>
+
+    <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin-bottom:18px;">
+      <p style="font-size:12px;color:var(--gray-500);margin:0 0 4px;text-transform:uppercase;font-weight:700;">Delivery</p>
+      <p style="margin:0;font-weight:600;font-size:13.5px;">${escapeHtml(o.delivery_option || '—')}</p>
+      ${o.delivery_weight_band ? `<p style="margin:4px 0 0;font-size:12px;color:var(--gray-500);">Weight: ${escapeHtml(o.delivery_weight_band)}</p>` : ''}
+      ${o.delivery_doorstep ? `<p style="margin:4px 0 0;font-size:12px;color:var(--gray-500);">Doorstep delivery included</p>` : ''}
+    </div>
 
     <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin-bottom:18px;">
       <p style="font-size:12px;color:var(--gray-500);margin:0 0 4px;text-transform:uppercase;font-weight:700;">Payment Method</p>
