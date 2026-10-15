@@ -45,6 +45,15 @@ body {
   line-height: 1.5;
 }
 
+body.site-content-loading {
+  background: #fff;
+}
+
+body.site-content-loading .announce-bar,
+body.site-content-loading .hero-wrap {
+  visibility: hidden;
+}
+
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 button { font-family: inherit; cursor: pointer; }

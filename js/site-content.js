@@ -171,4 +171,6 @@ function applySiteContentToDom(content) {
     const message = encodeURIComponent(`Hi! I have a question about a product on WigsbyAmah.`);
     waBtn.setAttribute('href', `https://wa.me/${content.whatsapp_number}?text=${message}`);
   }
+
+  document.body.classList.remove('site-content-loading');
 }

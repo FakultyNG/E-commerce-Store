@@ -102,18 +102,11 @@ function renderDeliveryOptions(settings, symbol) {
   return `
     <div class="delivery-options">
       ${config.zones.map(zone => {
-        const fee1 = Number((zone.fees || {})['1_2'] || 0);
-        const fee2 = Number((zone.fees || {})['2_4'] || 0);
-        const fee3 = Number((zone.fees || {})['4_plus'] || 0);
-        const priceText = zone.key === 'pickup'
-          ? 'Free'
-          : `${fmtPrice(fee1, symbol)} / ${fmtPrice(fee2, symbol)} / ${fmtPrice(fee3, symbol)}`;
         return `
           <label class="delivery-option ${delivery.option === zone.key ? 'selected' : ''}">
             <input type="radio" name="delivery_option" value="${escapeHtml(zone.key)}" ${delivery.option === zone.key ? 'checked' : ''}>
             <span>
               <strong>${escapeHtml(zone.label)}</strong>
-              <small>${priceText}</small>
             </span>
           </label>`;
       }).join('')}
